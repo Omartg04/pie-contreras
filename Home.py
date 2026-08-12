@@ -31,7 +31,7 @@ with st.sidebar:
         <p style='color:{COLOR_TEXTO}; font-size:1rem; font-weight:600; margin:0.2rem 0;'>
             La Magdalena Contreras
         </p>
-        <p style='color:{COLOR_SECUNDARIO}; font-size:0.78rem; margin:0;'>
+        <p style='color:{COLOR_ACENTO};font-weight:600; font-size:0.78rem; margin:0;'>
             Interna Morena 2026
         </p>
     </div>

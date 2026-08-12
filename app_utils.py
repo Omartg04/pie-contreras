@@ -69,15 +69,17 @@ def verificar_acceso():
 
     st.markdown(f"""
     <div style='text-align:center; padding: 3rem 1rem 1rem;'>
-        <p style='color:{COLOR_SECUNDARIO}; font-size:0.85rem; letter-spacing:0.15em;
-                  text-transform:uppercase; margin-bottom:0.5rem;'>
+        <p style='color:{COLOR_ACENTO}; font-size:0.82rem; letter-spacing:0.2em;
+                  text-transform:uppercase; margin-bottom:0.5rem; font-weight:600;'>
             PLATAFORMA DE INTELIGENCIA ELECTORAL
         </p>
-        <h1 style='color:{COLOR_TEXTO}; font-family:Georgia, serif;
-                   font-size:2rem; font-weight:400; margin:0 0 0.3rem;'>
+        <h1 style='color:#FFFFFF !important; font-family:Georgia, serif;
+                   font-size:2.2rem; font-weight:700; margin:0 0 0.3rem;
+                   text-shadow: 0 1px 4px rgba(0,0,0,0.5);'>
             La Magdalena Contreras
         </h1>
-        <p style='color:{COLOR_ACENTO}; font-size:0.9rem; margin-bottom:2.5rem;'>
+        <p style='color:{COLOR_ACENTO}; font-size:1rem; margin-bottom:2.5rem;
+                  font-weight:600; letter-spacing:0.05em;'>
             Interna Morena 2026
         </p>
     </div>
@@ -119,49 +121,74 @@ def aplicar_estilos():
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap');
 
-    html, body, [class*="css"] {{
-        font-family: 'Inter', sans-serif;
-        background-color: {COLOR_FONDO};
+    /* ── Fondo global — capturar todos los niveles de Streamlit ── */
+    .stApp, .stApp > div, .stApp > div > div,
+    html, body,
+    .main, .main > div,
+    [data-testid="stAppViewContainer"],
+    [data-testid="stAppViewContainer"] > div,
+    [data-testid="stMain"],
+    [data-testid="stMainBlockContainer"] {{
+        background-color: {COLOR_FONDO} !important;
+    }}
+
+    /* ── Tipografía global ── */
+    html, body, [class*="css"], p, span, label, div {{
+        font-family: 'Inter', sans-serif !important;
         color: {COLOR_TEXTO};
     }}
-    h1, h2, h3 {{
-        font-family: 'Barlow Condensed', sans-serif;
-        font-weight: 600;
-        letter-spacing: 0.02em;
-        color: {COLOR_TEXTO} !important;
-    }}
-    /* Forzar color en headings de st.markdown */
+
+    /* ── Headings ── */
+    h1, h2, h3, h4, h5, h6,
     .stMarkdown h1, .stMarkdown h2, .stMarkdown h3,
     .stMarkdown h4, .stMarkdown h5, .stMarkdown h6 {{
-        color: {COLOR_TEXTO} !important;
-        font-family: 'Barlow Condensed', sans-serif;
-    }}
-    /* Título de página (st.title) */
-    [data-testid="stHeader"], .css-10trblm {{
+        font-family: 'Barlow Condensed', sans-serif !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.02em !important;
         color: {COLOR_TEXTO} !important;
     }}
+
+    /* ── Botones ── */
     .stButton > button {{
-        background-color: {COLOR_ALTA};
-        color: #FFFFFF;
-        border: none;
-        border-radius: 4px;
-        font-weight: 600;
-        font-size: 0.85rem;
+        background-color: {COLOR_ALTA} !important;
+        color: #FFFFFF !important;
+        border: none !important;
+        border-radius: 4px !important;
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
     }}
     .stButton > button:hover {{
-        background-color: #531521;
-        color: #FFFFFF;
+        background-color: #531521 !important;
+        color: #FFFFFF !important;
     }}
+
+    /* ── Inputs ── */
+    .stTextInput > div > div > input {{
+        background-color: #2a0a0d !important;
+        color: {COLOR_TEXTO} !important;
+        border: 1px solid #3a1010 !important;
+    }}
+
+    /* ── Selectbox / multiselect ── */
     .stSelectbox > div, .stMultiSelect > div {{
-        background-color: {COLOR_TARJETA};
+        background-color: {COLOR_TARJETA} !important;
     }}
-    div[data-testid="stSidebar"] {{
-        background-color: {COLOR_TARJETA};
-        border-right: 1px solid #3a1010;
+
+    /* ── Sidebar ── */
+    div[data-testid="stSidebar"],
+    div[data-testid="stSidebar"] > div {{
+        background-color: {COLOR_TARJETA} !important;
+        border-right: 1px solid #3a1010 !important;
     }}
+
+    /* ── Tablas ── */
+    [data-testid="stDataFrame"] {{
+        background-color: {COLOR_TARJETA} !important;
+    }}
+
     .block-container {{
-        padding-top: 1.5rem;
-        padding-bottom: 2rem;
+        padding-top: 1.5rem !important;
+        padding-bottom: 2rem !important;
     }}
     footer {{ visibility: hidden; }}
     </style>
