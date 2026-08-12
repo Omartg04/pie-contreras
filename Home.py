@@ -35,7 +35,7 @@ with st.sidebar:
             Interna Morena 2026
         </p>
     </div>
-    <hr style='border:none;border-top:1px solid #2a3550;margin:0.8rem 0;'>
+    <hr style='border:none;border-top:1px solid #3a1010;margin:0.8rem 0;'>
     """, unsafe_allow_html=True)
 
     st.page_link("Home.py",                      label="🏠  Inicio",               )
@@ -43,7 +43,7 @@ with st.sidebar:
     st.page_link("pages/02_Mapa_Manzanas.py",    label="📍  Mapa de manzanas"      )
     st.page_link("pages/03_Ranking.py",           label="📊  Ranking y ficha"       )
 
-    st.markdown("<hr style='border:none;border-top:1px solid #2a3550;margin:1rem 0;'>",
+    st.markdown("<hr style='border:none;border-top:1px solid #3a1010;margin:1rem 0;'>",
                 unsafe_allow_html=True)
     if st.button("Cerrar sesión", use_container_width=True):
         from app_utils import cerrar_sesion
@@ -59,7 +59,9 @@ gdf  = cargar_unificado()
 p3   = rank[(rank["NIVEL_PRIORIDAD_OP"]=="P3_MEDIA") & (rank["SECCION"]>0)]
 nucl = p3.head(25)
 mzas_s1  = gdf[gdf["es_prioritaria_s1"]==True]
-hallazgo = gdf[(gdf["NIVEL_MZA"]=="MA_ALTA") & (gdf["es_prioritaria_s1"]!=True)]
+ln_mzas_s1   = mzas_s1["LN_estimada"].sum()
+ln_total_mun = gdf["LN_estimada"].sum()
+pct_cobertura = ln_mzas_s1 / ln_total_mun * 100 if ln_total_mun > 0 else 0
 
 # ── KPIs ─────────────────────────────────────────────────────────────────────
 c1, c2, c3, c4 = st.columns(4)
@@ -68,21 +70,45 @@ with c1:
         f"{len(p3)}",
         f"Núcleo prioritario: {len(nucl)}",
         COLOR_ALTA)
+    st.markdown(f"""
+    <p style='color:{COLOR_SECUNDARIO};font-size:0.78rem;line-height:1.5;
+              margin:-0.2rem 0 1rem;padding:0 0.2rem;'>
+        Secciones con mayor probabilidad de ser incluidas en la muestra.
+        Las primeras 25 concentran la mayor rentabilidad territorial.
+    </p>""", unsafe_allow_html=True)
 with c2:
     kpi("Manzanas prioritarias",
         f"{len(mzas_s1):,}",
         f"Corte 50% LN por sección",
         COLOR_ALTA)
+    st.markdown(f"""
+    <p style='color:{COLOR_SECUNDARIO};font-size:0.78rem;line-height:1.5;
+              margin:-0.2rem 0 1rem;padding:0 0.2rem;'>
+        Manzanas que concentran el 50% de la lista nominal de cada sección.
+        El destino de las brigadas de campo.
+    </p>""", unsafe_allow_html=True)
 with c3:
-    kpi("LN en núcleo prioritario",
+    kpi("Electores en secciones prioritarias",
         f"{nucl['LN_TOTAL'].sum():,.0f}",
         f"{nucl['LN_TOTAL'].sum()/213700*100:.1f}% del padrón total",
         COLOR_MEDIA)
+    st.markdown(f"""
+    <p style='color:{COLOR_SECUNDARIO};font-size:0.78rem;line-height:1.5;
+              margin:-0.2rem 0 1rem;padding:0 0.2rem;'>
+        Electores que viven en las secciones prioritarias. Concentrar
+        la operación aquí maximiza la incidencia en cualquier encuesta externa.
+    </p>""", unsafe_allow_html=True)
 with c4:
-    kpi("Manzanas destacadas",
-        f"{len(hallazgo)}",
-        "IRE alto fuera del corte de LN",
-        COLOR_MORENA)
+    kpi("Cobertura del operativo",
+        f"{pct_cobertura:.1f}%",
+        f"{ln_mzas_s1:,.0f} electores en manzanas prioritarias",
+        COLOR_ALTA)
+    st.markdown(f"""
+    <p style='color:{COLOR_SECUNDARIO};font-size:0.78rem;line-height:1.5;
+              margin:-0.2rem 0 1rem;padding:0 0.2rem;'>
+        Fracción del padrón municipal que vive en las manzanas donde
+        operan las brigadas. A mayor cobertura, mayor impacto.
+    </p>""", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 

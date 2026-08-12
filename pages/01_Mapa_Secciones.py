@@ -35,13 +35,13 @@ with st.sidebar:
         <p style='color:{COLOR_TEXTO};font-size:1rem;font-weight:600;margin:0.2rem 0;'>
             La Magdalena Contreras</p>
     </div>
-    <hr style='border:none;border-top:1px solid #2a3550;margin:0.8rem 0;'>
+    <hr style='border:none;border-top:1px solid #3a1010;margin:0.8rem 0;'>
     """, unsafe_allow_html=True)
     st.page_link("Home.py",                      label="🏠  Inicio")
     st.page_link("pages/01_Mapa_Secciones.py",   label="🗺️  Mapa de secciones")
     st.page_link("pages/02_Mapa_Manzanas.py",    label="📍  Mapa de manzanas")
     st.page_link("pages/03_Ranking.py",           label="📊  Ranking y ficha")
-    st.markdown("<hr style='border:none;border-top:1px solid #2a3550;margin:1rem 0;'>",
+    st.markdown("<hr style='border:none;border-top:1px solid #3a1010;margin:1rem 0;'>",
                 unsafe_allow_html=True)
 
     st.markdown(f"<p style='color:{COLOR_TEXTO};font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;'>Filtros</p>",
@@ -97,7 +97,7 @@ secs_vis = secs_m[secs_m["SECCION"].isin(filtro_niveles)]
 m = folium.Map(
     location=[PROYECTO["lat_centro"], PROYECTO["lon_centro"]],
     zoom_start=PROYECTO["zoom"],
-    tiles="CartoDB dark_matter",
+    tiles="CartoDB positron",
     control_scale=True,
 )
 
@@ -138,7 +138,7 @@ for _, row in secs_vis.iterrows():
     tooltip = f"""
     <div style='font-family:sans-serif;font-size:12px;min-width:200px;'>
         <b style='font-size:13px;'>Sección {int(row['SECCION'])}</b>
-        &nbsp;<span style='color:{"#e8a33d" if nucleo else "#5b7a9e"};font-size:11px;'>{etiqueta}</span><br>
+        &nbsp;<span style='color:{"#C1272D" if nucleo else "#8B1A1A"};font-size:11px;'>{etiqueta}</span><br>
         <hr style='margin:4px 0;border:none;border-top:1px solid #ccc;'>
         <b>Lista Nominal:</b> {ln_str}<br>
         <b>Prob. encuesta:</b> {ire_str}<br>

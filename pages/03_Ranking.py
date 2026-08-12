@@ -33,13 +33,13 @@ with st.sidebar:
         <p style='color:{COLOR_TEXTO};font-size:1rem;font-weight:600;margin:0.2rem 0;'>
             La Magdalena Contreras</p>
     </div>
-    <hr style='border:none;border-top:1px solid #2a3550;margin:0.8rem 0;'>
+    <hr style='border:none;border-top:1px solid #3a1010;margin:0.8rem 0;'>
     """, unsafe_allow_html=True)
     st.page_link("Home.py",                      label="🏠  Inicio")
     st.page_link("pages/01_Mapa_Secciones.py",   label="🗺️  Mapa de secciones")
     st.page_link("pages/02_Mapa_Manzanas.py",    label="📍  Mapa de manzanas")
     st.page_link("pages/03_Ranking.py",           label="📊  Ranking y ficha")
-    st.markdown("<hr style='border:none;border-top:1px solid #2a3550;margin:1rem 0;'>",
+    st.markdown("<hr style='border:none;border-top:1px solid #3a1010;margin:1rem 0;'>",
                 unsafe_allow_html=True)
 
     if st.button("Cerrar sesión", use_container_width=True):
@@ -237,7 +237,7 @@ with tab_ficha:
                         {f"{part*100:.1f}%" if pd.notna(part) else "—"}
                     </span>
                 </p>
-                <hr style='border:none;border-top:1px solid #2a3550;margin:0.5rem 0;'>
+                <hr style='border:none;border-top:1px solid #3a1010;margin:0.5rem 0;'>
                 <p style='color:{COLOR_SECUNDARIO};font-size:0.72rem;margin:0;line-height:1.5;'>
                     La fuerza del bloque en esta sección es del
                     <b style='color:{COLOR_MORENA};'>

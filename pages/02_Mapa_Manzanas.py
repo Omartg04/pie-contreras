@@ -35,13 +35,13 @@ with st.sidebar:
         <p style='color:{COLOR_TEXTO};font-size:1rem;font-weight:600;margin:0.2rem 0;'>
             La Magdalena Contreras</p>
     </div>
-    <hr style='border:none;border-top:1px solid #2a3550;margin:0.8rem 0;'>
+    <hr style='border:none;border-top:1px solid #3a1010;margin:0.8rem 0;'>
     """, unsafe_allow_html=True)
     st.page_link("Home.py",                      label="🏠  Inicio")
     st.page_link("pages/01_Mapa_Secciones.py",   label="🗺️  Mapa de secciones")
     st.page_link("pages/02_Mapa_Manzanas.py",    label="📍  Mapa de manzanas")
     st.page_link("pages/03_Ranking.py",           label="📊  Ranking y ficha")
-    st.markdown("<hr style='border:none;border-top:1px solid #2a3550;margin:1rem 0;'>",
+    st.markdown("<hr style='border:none;border-top:1px solid #3a1010;margin:1rem 0;'>",
                 unsafe_allow_html=True)
 
     st.markdown(f"<p style='color:{COLOR_TEXTO};font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;'>Filtros</p>",
@@ -116,7 +116,7 @@ else:
 m = folium.Map(
     location=[lat_c, lon_c],
     zoom_start=zoom,
-    tiles="CartoDB dark_matter",
+    tiles="CartoDB positron",
 )
 
 ire_vals = mzas_vis["IRE_MZA"].dropna() if "IRE_MZA" in mzas_vis.columns else pd.Series([0.1, 0.6])
@@ -132,8 +132,8 @@ if not solo_prioritarias:
             folium.GeoJson(
                 geom_json,
                 style_function=lambda x: {
-                    "fillColor": "#2e3a52", "fillOpacity": 0.4,
-                    "color": "#3a4d6e", "weight": 0.4,
+                    "fillColor": "#e0e0e0", "fillOpacity": 0.5,
+                    "color": "#bbbbbb", "weight": 0.4,
                 },
             ).add_to(m)
         except Exception:

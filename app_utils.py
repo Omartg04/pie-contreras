@@ -7,23 +7,23 @@ import pandas as pd
 import geopandas as gpd
 from datetime import date
 
-# ── Paleta de color ───────────────────────────────────────────────────────────
-COLOR_ALTA      = "#e8a33d"   # ámbar — zona alta prioridad
-COLOR_MEDIA     = "#5b7a9e"   # acero — zona media
-COLOR_BAJA      = "#2e3a52"   # acero oscuro — zona referencia
-COLOR_MORENA    = "#b5451b"   # terracota — fuerza Morena / hallazgo
+# ── Paleta de color — Morena ──────────────────────────────────────────────────
+COLOR_ALTA      = "#C1272D"   # rojo Morena — prioridad alta, acentos principales
+COLOR_MEDIA     = "#8B1A1A"   # borgoña — prioridad media
+COLOR_BAJA      = "#4a4a4a"   # gris neutro — zona referencia
+COLOR_MORENA    = "#C1272D"   # rojo Morena (alias de COLOR_ALTA)
 COLOR_POSITIVO  = "#3f7a52"   # verde — datos positivos
-COLOR_FONDO     = "#1a1a2e"   # fondo principal
-COLOR_TARJETA   = "#16213e"   # fondo de tarjetas
-COLOR_TEXTO     = "#e0e0e0"   # texto principal
-COLOR_SECUNDARIO= "#a0a8b8"   # texto secundario
+COLOR_FONDO     = "#160808"   # negro-borgoña — fondo principal
+COLOR_TARJETA   = "#220e0e"   # borgoña muy oscuro — fondo de tarjetas
+COLOR_TEXTO     = "#f0e8e8"   # blanco cálido — texto principal
+COLOR_SECUNDARIO= "#b8a8a8"   # rosa grisáceo — texto secundario
 
 # Colores por nivel operativo (lenguaje cliente)
 COLOR_NIVEL = {
-    "P1_CERTEZA": COLOR_ALTA,
-    "P2_ALTA":    COLOR_ALTA,
-    "P3_MEDIA":   COLOR_MEDIA,
-    "P4_BAJA":    COLOR_BAJA,
+    "P1_CERTEZA": "#C1272D",   # rojo Morena
+    "P2_ALTA":    "#C1272D",   # rojo Morena
+    "P3_MEDIA":   "#8B1A1A",   # borgoña
+    "P4_BAJA":    "#4a4a4a",   # gris
 }
 
 # Traducción de niveles a lenguaje cliente
@@ -134,7 +134,7 @@ def aplicar_estilos():
     }}
     div[data-testid="stSidebar"] {{
         background-color: {COLOR_TARJETA};
-        border-right: 1px solid #2a3550;
+        border-right: 1px solid #3a1010;
     }}
     .block-container {{
         padding-top: 1.5rem;
@@ -213,16 +213,18 @@ def cargar_ranking():
                          "data/pie_010_mc_ranking.csv", nrows=0).columns else {})
     return df
 
-# ── Color por IRE continuo (gradiente acero → ámbar) ────────────────────────
+# ── Color por IRE continuo (gradiente gris claro → rojo Morena) ─────────────
 def color_ire(valor, vmin=0.0, vmax=1.0):
-    """Interpola entre COLOR_MEDIA y COLOR_ALTA según el IRE."""
+    """Interpola entre gris claro y rojo Morena según el IRE.
+    Diseñado para mapas con fondo CartoDB positron (claro).
+    """
     if valor is None or pd.isna(valor):
-        return "#2e3a52"
+        return "#cccccc"
     t = max(0.0, min(1.0, (valor - vmin) / (vmax - vmin + 1e-9)))
-    # acero (#5b7a9e) → ámbar (#e8a33d)
-    r = int(0x5b + t*(0xe8 - 0x5b))
-    g = int(0x7a + t*(0xa3 - 0x7a))
-    b = int(0x9e + t*(0x3d - 0x9e))
+    # gris claro (#cccccc) → rojo Morena (#C1272D)
+    r = int(0xcc + t*(0xC1 - 0xcc))
+    g = int(0xcc + t*(0x27 - 0xcc))
+    b = int(0xcc + t*(0x2D - 0xcc))
     return f"#{r:02x}{g:02x}{b:02x}"
 
 # ── Badge de nivel ────────────────────────────────────────────────────────────
