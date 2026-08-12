@@ -4,4 +4,6 @@ geopandas
 folium
 streamlit-folium
 numpy
+branca
+pypdf
 starlette<1.4.0
