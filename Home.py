@@ -162,56 +162,11 @@ with c8:
 col_tabla, col_info = st.columns([3, 2])
 
 with col_tabla:
-    col_h, col_btn = st.columns([3, 1])
-    with col_h:
-        st.markdown(f"""
-        <h3 style='color:{COLOR_TEXTO}; font-size:1.1rem; margin-bottom:0.8rem;'>
-            Top 10 secciones — Ranking operativo
-        </h3>
-        """, unsafe_allow_html=True)
-    with col_btn:
-        # ── Helper: preparar CSV limpio ────────────────────────────────
-        def _csv_limpio(df_in, incluir_referencia=False):
-            df = df_in[df_in["SECCION"] > 0].copy()
-            df = df.sort_values("RANK_ESTRATEGICO")
-            df["Prioridad"] = df.apply(
-                lambda r: (
-                    "Núcleo top 25"      if r["NIVEL_PRIORIDAD_OP"]=="P3_MEDIA" and r["RANK_ESTRATEGICO"]<=26
-                    else "Extensión operativa" if r["NIVEL_PRIORIDAD_OP"]=="P3_MEDIA"
-                    else "Referencia"
-                ), axis=1
-            )
-            if not incluir_referencia:
-                df = df[df["NIVEL_PRIORIDAD_OP"]=="P3_MEDIA"]
-            df["Fuerza Morena (%)"]    = (df["fuerza_morena"] * 100).round(1)
-            df["Participación 2024 (%)"] = (df["PARTICIPACION_2024"] * 100).round(1)
-            cols = {
-                "RANK_ESTRATEGICO":      "# Ranking",
-                "SECCION":               "Sección",
-                "LN_TOTAL":              "Lista Nominal",
-                "Prioridad":             "Prioridad",
-                "IRE_SCORE":             "Probabilidad de encuesta",
-                "Fuerza Morena (%)":     "Fuerza Morena (%)",
-                "INDICE_RENTABILIDAD":   "Índice Rentabilidad",
-                "Participación 2024 (%)":"Participación 2024 (%)",
-            }
-            return df[list(cols.keys())].rename(columns=cols).to_csv(index=False).encode("utf-8")
-
-        st.download_button(
-            label="⬇  59 secciones operativas",
-            data=_csv_limpio(rank, incluir_referencia=False),
-            file_name="pie_010_mc_operativas.csv",
-            mime="text/csv",
-            use_container_width=True,
-        )
-        st.markdown("<div style='height:0.4rem'></div>", unsafe_allow_html=True)
-        st.download_button(
-            label="⬇  Universo completo (148 secciones)",
-            data=_csv_limpio(rank, incluir_referencia=True),
-            file_name="pie_010_mc_universo_completo.csv",
-            mime="text/csv",
-            use_container_width=True,
-        )
+    st.markdown(f"""
+    <h3 style='color:{COLOR_TEXTO}; font-size:1.1rem; margin-bottom:0.8rem;'>
+        Top 10 secciones — Ranking operativo
+    </h3>
+    """, unsafe_allow_html=True)
 
     top10 = p3.head(10)[["RANK_ESTRATEGICO","SECCION","LN_TOTAL",
                            "IRE_SCORE","fuerza_morena","INDICE_RENTABILIDAD"]].copy()
@@ -235,6 +190,53 @@ with col_tabla:
     )
     st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.73rem;margin-top:0.2rem;'>★ Top 25 = secciones con mayor rentabilidad territorial (núcleo del operativo)</p>",
                 unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # ── Helper CSV limpio ─────────────────────────────────────────────
+    def _csv_limpio(df_in, incluir_referencia=False):
+        df = df_in[df_in["SECCION"] > 0].copy()
+        df = df.sort_values("RANK_ESTRATEGICO")
+        df["Prioridad"] = df.apply(
+            lambda r: (
+                "Núcleo top 25"           if r["NIVEL_PRIORIDAD_OP"]=="P3_MEDIA" and r["RANK_ESTRATEGICO"]<=26
+                else "Extensión operativa" if r["NIVEL_PRIORIDAD_OP"]=="P3_MEDIA"
+                else "Referencia"
+            ), axis=1
+        )
+        if not incluir_referencia:
+            df = df[df["NIVEL_PRIORIDAD_OP"]=="P3_MEDIA"]
+        df["Fuerza Morena (%)"]      = (df["fuerza_morena"] * 100).round(1)
+        df["Participación 2024 (%)"] = (df["PARTICIPACION_2024"] * 100).round(1)
+        cols = {
+            "RANK_ESTRATEGICO":       "# Ranking",
+            "SECCION":                "Sección",
+            "LN_TOTAL":               "Lista Nominal",
+            "Prioridad":              "Prioridad",
+            "IRE_SCORE":              "Probabilidad de encuesta",
+            "Fuerza Morena (%)":      "Fuerza Morena (%)",
+            "INDICE_RENTABILIDAD":    "Índice Rentabilidad",
+            "Participación 2024 (%)": "Participación 2024 (%)",
+        }
+        return df[list(cols.keys())].rename(columns=cols).to_csv(index=False).encode("utf-8")
+
+    bd1, bd2 = st.columns(2)
+    with bd1:
+        st.download_button(
+            label="⬇  59 secciones operativas",
+            data=_csv_limpio(rank, incluir_referencia=False),
+            file_name="pie_010_mc_operativas.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
+    with bd2:
+        st.download_button(
+            label="⬇  Universo completo (148 secciones)",
+            data=_csv_limpio(rank, incluir_referencia=True),
+            file_name="pie_010_mc_universo_completo.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
 
 with col_info:
     st.markdown(f"""
