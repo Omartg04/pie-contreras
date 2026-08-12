@@ -116,16 +116,27 @@ st.markdown("<br>", unsafe_allow_html=True)
 col_tabla, col_info = st.columns([3, 2])
 
 with col_tabla:
-    st.markdown(f"""
-    <h3 style='color:{COLOR_TEXTO}; font-size:1.1rem; margin-bottom:0.8rem;'>
-        Top 10 secciones — Ranking operativo
-    </h3>
-    """, unsafe_allow_html=True)
+    col_h, col_btn = st.columns([3, 1])
+    with col_h:
+        st.markdown(f"""
+        <h3 style='color:{COLOR_TEXTO}; font-size:1.1rem; margin-bottom:0.8rem;'>
+            Top 10 secciones — Ranking operativo
+        </h3>
+        """, unsafe_allow_html=True)
+    with col_btn:
+        csv_bytes = rank.to_csv(index=False).encode("utf-8")
+        st.download_button(
+            label="⬇ 59 secciones CSV",
+            data=csv_bytes,
+            file_name="pie_010_mc_ranking_estrategico.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
 
     top10 = p3.head(10)[["RANK_ESTRATEGICO","SECCION","LN_TOTAL",
                            "IRE_SCORE","fuerza_morena","INDICE_RENTABILIDAD"]].copy()
     top10["Prioridad"]       = top10["RANK_ESTRATEGICO"].apply(
-        lambda r: "★ Núcleo" if r<=25 else "Extensión")
+        lambda r: "★ Top 25" if r<=25 else "Extensión")
     top10["Prob. encuesta"]  = top10["IRE_SCORE"].apply(lambda x: f"{x:.3f}")
     top10["Fuerza Morena"]   = top10["fuerza_morena"].apply(
         lambda x: f"{x*100:.1f}%" if x==x else "—")
@@ -142,6 +153,8 @@ with col_tabla:
         hide_index=True,
         height=370,
     )
+    st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.73rem;margin-top:0.2rem;'>★ Top 25 = secciones con mayor rentabilidad territorial (núcleo del operativo)</p>",
+                unsafe_allow_html=True)
 
 with col_info:
     st.markdown(f"""

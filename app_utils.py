@@ -35,13 +35,24 @@ NIVEL_LABEL = {
     "P4_BAJA":    "Zona de referencia",
 }
 
+# ── Meses en español ─────────────────────────────────────────────────────────
+MESES_ES = {
+    1: "enero", 2: "febrero", 3: "marzo", 4: "abril",
+    5: "mayo", 6: "junio", 7: "julio", 8: "agosto",
+    9: "septiembre", 10: "octubre", 11: "noviembre", 12: "diciembre"
+}
+
+def fecha_es(d):
+    """Devuelve fecha en español: '12 de noviembre de 2026'."""
+    return f"{d.day} de {MESES_ES[d.month]} de {d.year}"
+
 # ── Identidad del proyecto ────────────────────────────────────────────────────
 PROYECTO = {
     "nombre":    "PIE — Plataforma de Inteligencia Electoral",
     "modulo":    "Módulo de Priorización Territorial",
     "subtitulo": "Interna Morena 2026",
     "municipio": "La Magdalena Contreras",
-    "vigencia":  date(2027, 2, 12),
+    "vigencia":  date(2026, 11, 12),
     "lat_centro": 19.298,
     "lon_centro": -99.268,
     "zoom":      13,
@@ -90,7 +101,7 @@ def verificar_acceso():
     dias_restantes = (PROYECTO["vigencia"] - date.today()).days
     st.markdown(f"""
     <p style='text-align:center; color:{COLOR_SECUNDARIO}; font-size:0.75rem; margin-top:2rem;'>
-        Plataforma vigente hasta {PROYECTO["vigencia"].strftime("%d de %B de %Y")}
+        Plataforma vigente hasta {fecha_es(PROYECTO["vigencia"])}
         · {max(dias_restantes,0)} días restantes
     </p>
     """, unsafe_allow_html=True)
@@ -117,6 +128,17 @@ def aplicar_estilos():
         font-family: 'Barlow Condensed', sans-serif;
         font-weight: 600;
         letter-spacing: 0.02em;
+        color: {COLOR_TEXTO} !important;
+    }}
+    /* Forzar color en headings de st.markdown */
+    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3,
+    .stMarkdown h4, .stMarkdown h5, .stMarkdown h6 {{
+        color: {COLOR_TEXTO} !important;
+        font-family: 'Barlow Condensed', sans-serif;
+    }}
+    /* Título de página (st.title) */
+    [data-testid="stHeader"], .css-10trblm {{
+        color: {COLOR_TEXTO} !important;
     }}
     .stButton > button {{
         background-color: {COLOR_ALTA};
@@ -148,7 +170,8 @@ def aplicar_estilos():
 # ── Componente KPI ────────────────────────────────────────────────────────────
 def kpi(label, valor, delta="", color=None):
     color = color or COLOR_ACENTO
-    delta_html = f"<p style='color:{color};font-size:0.75rem;margin:4px 0 0;'>{delta}</p>" if delta else ""
+    # Delta siempre en dorado — garantiza contraste sobre fondo oscuro
+    delta_html = f"<p style='color:{COLOR_ACENTO};font-size:0.75rem;margin:4px 0 0;'>{delta}</p>" if delta else ""
     st.markdown(f"""
     <div style='background:{COLOR_TARJETA}; border-left:4px solid {color};
                 padding:1rem 1.2rem; border-radius:6px; margin-bottom:0.5rem;'>
