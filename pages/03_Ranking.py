@@ -52,8 +52,10 @@ rank = cargar_ranking()
 gdf  = cargar_unificado()
 secs = cargar_secciones()
 
-# Columnas electorales vienen del GeoJSON de secciones, no del CSV de ranking
-COLS_ELECT = ["SECCION", "GANADOR_2024", "MARGEN_PCT_2024", "PARTICIPACION_2024"]
+# GANADOR_2024 y MARGEN_PCT_2024 vienen del GeoJSON de secciones.
+# PARTICIPACION_2024 ya está en el ranking CSV — excluirla del merge
+# para evitar columnas duplicadas _x/_y.
+COLS_ELECT = ["SECCION", "GANADOR_2024", "MARGEN_PCT_2024"]
 cols_elect_ok = [c for c in COLS_ELECT if c in secs.columns]
 rank = rank.merge(secs[cols_elect_ok], on="SECCION", how="left")
 
