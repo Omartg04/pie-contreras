@@ -72,13 +72,14 @@ secs = cargar_secciones()
 p3   = rank[(rank["NIVEL_PRIORIDAD_OP"]=="P3_MEDIA") & (rank["SECCION"]>0)].copy()
 p3["es_nucleo"] = p3["RANK_ESTRATEGICO"] <= 25
 
-# Merge secciones con ranking
-secs_m = secs.merge(
-    rank[["SECCION","IRE_SCORE","NIVEL_PRIORIDAD_OP","INDICE_RENTABILIDAD",
-          "fuerza_morena","RANK_ESTRATEGICO","PARTICIPACION_2024",
-          "GANADOR_2024","MARGEN_PCT_2024","LN_TOTAL"]],
-    on="SECCION", how="left"
-)
+# Merge secciones con ranking.
+# Del CSV de ranking solo traemos las columnas exclusivas del pipeline MC;
+# GANADOR_2024, MARGEN_PCT_2024, PARTICIPACION_2024 y LN_TOTAL ya vienen
+# en el GeoJSON de secciones — incluirlas del CSV generaría sufijos _x/_y.
+COLS_RANK = ["SECCION", "IRE_SCORE", "NIVEL_PRIORIDAD_OP",
+             "INDICE_RENTABILIDAD", "fuerza_morena", "RANK_ESTRATEGICO"]
+cols_rank_ok = [c for c in COLS_RANK if c in rank.columns]  # defensivo
+secs_m = secs.merge(rank[cols_rank_ok], on="SECCION", how="left")
 secs_m = secs_m.to_crs("EPSG:4326")
 secs_m["es_nucleo"] = secs_m["RANK_ESTRATEGICO"].apply(
     lambda r: r<=25 if pd.notna(r) else False)
