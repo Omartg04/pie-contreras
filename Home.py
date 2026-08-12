@@ -56,9 +56,13 @@ header("Inicio", "Resumen del módulo de priorización territorial")
 rank = cargar_ranking()
 gdf  = cargar_unificado()
 
-p3   = rank[(rank["NIVEL_PRIORIDAD_OP"]=="P3_MEDIA") & (rank["SECCION"]>0)]
-nucl = p3.head(25)
-mzas_s1  = gdf[gdf["es_prioritaria_s1"]==True]
+p3   = rank[(rank["NIVEL_PRIORIDAD_OP"]=="P3_MEDIA") & (rank["SECCION"]>0)].sort_values("RANK_ESTRATEGICO")
+nucl      = p3.head(25)
+extension = p3.tail(len(p3)-25)
+referencia= rank[(rank["NIVEL_PRIORIDAD_OP"]!="P3_MEDIA") & (rank["SECCION"]>0)]
+total_secs = len(rank[rank["SECCION"]>0])
+
+mzas_s1      = gdf[gdf["es_prioritaria_s1"]==True]
 ln_mzas_s1   = mzas_s1["LN_estimada"].sum()
 ln_total_mun = gdf["LN_estimada"].sum()
 pct_cobertura = ln_mzas_s1 / ln_total_mun * 100 if ln_total_mun > 0 else 0
@@ -112,6 +116,86 @@ with c4:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
+# ── Franja de contexto — universo de priorización ────────────────────────────
+st.markdown(f"""
+<div style='background:{COLOR_TARJETA}; border:1px solid #3a1010; border-radius:8px;
+            padding:1rem 1.5rem; margin-bottom:1.2rem;'>
+    <p style='color:{COLOR_SECUNDARIO}; font-size:0.72rem; letter-spacing:0.1em;
+              text-transform:uppercase; margin:0 0 0.8rem;'>
+        Universo de priorización — La Magdalena Contreras
+    </p>
+    <div style='display:flex; align-items:center; gap:0; flex-wrap:wrap;'>
+
+        <div style='text-align:center; padding:0 1.2rem;'>
+            <p style='color:{COLOR_TEXTO}; font-family:"Barlow Condensed",sans-serif;
+                      font-size:2rem; font-weight:700; margin:0; line-height:1;'>
+                {total_secs}
+            </p>
+            <p style='color:{COLOR_SECUNDARIO}; font-size:0.75rem; margin:3px 0 0;'>
+                secciones totales
+            </p>
+        </div>
+
+        <p style='color:#3a1010; font-size:1.8rem; margin:0; padding:0 0.2rem;'>→</p>
+
+        <div style='text-align:center; padding:0 1.2rem;
+                    border-left:2px solid #3a1010; border-right:2px solid #3a1010;'>
+            <p style='color:{COLOR_ACENTO}; font-family:"Barlow Condensed",sans-serif;
+                      font-size:2rem; font-weight:700; margin:0; line-height:1;'>
+                {len(p3)}
+            </p>
+            <p style='color:{COLOR_SECUNDARIO}; font-size:0.75rem; margin:3px 0 0;'>
+                secciones operativas
+            </p>
+            <p style='color:{COLOR_BAJA}; font-size:0.68rem; margin:1px 0 0;'>
+                mayor probabilidad de encuesta
+            </p>
+        </div>
+
+        <p style='color:#3a1010; font-size:1.8rem; margin:0; padding:0 0.2rem;'>→</p>
+
+        <div style='text-align:center; padding:0 1.2rem;'>
+            <p style='color:{COLOR_ALTA}; font-family:"Barlow Condensed",sans-serif;
+                      font-size:2rem; font-weight:700; margin:0; line-height:1;'>
+                {len(nucl)}
+            </p>
+            <p style='color:{COLOR_SECUNDARIO}; font-size:0.75rem; margin:3px 0 0;'>
+                núcleo prioritario
+            </p>
+            <p style='color:{COLOR_BAJA}; font-size:0.68rem; margin:1px 0 0;'>
+                mayor rentabilidad territorial
+            </p>
+        </div>
+
+        <p style='color:#3a1010; font-size:1.8rem; margin:0; padding:0 0.2rem;'>+</p>
+
+        <div style='text-align:center; padding:0 1.2rem;'>
+            <p style='color:{COLOR_MEDIA}; font-family:"Barlow Condensed",sans-serif;
+                      font-size:2rem; font-weight:700; margin:0; line-height:1;'>
+                {len(extension)}
+            </p>
+            <p style='color:{COLOR_SECUNDARIO}; font-size:0.75rem; margin:3px 0 0;'>
+                extensión operativa
+            </p>
+            <p style='color:{COLOR_BAJA}; font-size:0.68rem; margin:1px 0 0;'>
+                cobertura complementaria
+            </p>
+        </div>
+
+        <div style='margin-left:auto; text-align:right; padding-left:1rem;
+                    border-left:1px solid #3a1010;'>
+            <p style='color:{COLOR_BAJA}; font-size:0.75rem; margin:0;'>
+                {len(referencia)} secciones de referencia
+            </p>
+            <p style='color:{COLOR_BAJA}; font-size:0.68rem; margin:2px 0 0;'>
+                proyección estadística · sin operación de campo
+            </p>
+        </div>
+
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
 # ── Dos columnas: top 10 + contexto ──────────────────────────────────────────
 col_tabla, col_info = st.columns([3, 2])
 
@@ -124,11 +208,45 @@ with col_tabla:
         </h3>
         """, unsafe_allow_html=True)
     with col_btn:
-        csv_bytes = rank.to_csv(index=False).encode("utf-8")
+        # ── Helper: preparar CSV limpio ────────────────────────────────
+        def _csv_limpio(df_in, incluir_referencia=False):
+            df = df_in[df_in["SECCION"] > 0].copy()
+            df = df.sort_values("RANK_ESTRATEGICO")
+            df["Prioridad"] = df.apply(
+                lambda r: (
+                    "Núcleo top 25"      if r["NIVEL_PRIORIDAD_OP"]=="P3_MEDIA" and r["RANK_ESTRATEGICO"]<=26
+                    else "Extensión operativa" if r["NIVEL_PRIORIDAD_OP"]=="P3_MEDIA"
+                    else "Referencia"
+                ), axis=1
+            )
+            if not incluir_referencia:
+                df = df[df["NIVEL_PRIORIDAD_OP"]=="P3_MEDIA"]
+            df["Fuerza Morena (%)"]    = (df["fuerza_morena"] * 100).round(1)
+            df["Participación 2024 (%)"] = (df["PARTICIPACION_2024"] * 100).round(1)
+            cols = {
+                "RANK_ESTRATEGICO":      "# Ranking",
+                "SECCION":               "Sección",
+                "LN_TOTAL":              "Lista Nominal",
+                "Prioridad":             "Prioridad",
+                "IRE_SCORE":             "Probabilidad de encuesta",
+                "Fuerza Morena (%)":     "Fuerza Morena (%)",
+                "INDICE_RENTABILIDAD":   "Índice Rentabilidad",
+                "Participación 2024 (%)":"Participación 2024 (%)",
+            }
+            return df[list(cols.keys())].rename(columns=cols).to_csv(index=False).encode("utf-8")
+
         st.download_button(
-            label="⬇ 59 secciones CSV",
-            data=csv_bytes,
-            file_name="pie_010_mc_ranking_estrategico.csv",
+            label="⬇  59 secciones operativas",
+            data=_csv_limpio(rank, incluir_referencia=False),
+            file_name="pie_010_mc_operativas.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
+        st.markdown("<div style='height:0.4rem'></div>", unsafe_allow_html=True)
+        st.download_button(
+            label="⬇  Universo completo (148 secciones)",
+            data=_csv_limpio(rank, incluir_referencia=True),
+            file_name="pie_010_mc_universo_completo.csv",
             mime="text/csv",
             use_container_width=True,
         )
