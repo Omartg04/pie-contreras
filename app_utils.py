@@ -7,23 +7,24 @@ import pandas as pd
 import geopandas as gpd
 from datetime import date
 
-# ── Paleta de color — Morena ──────────────────────────────────────────────────
-COLOR_ALTA      = "#C1272D"   # rojo Morena — prioridad alta, acentos principales
-COLOR_MEDIA     = "#8B1A1A"   # borgoña — prioridad media
-COLOR_BAJA      = "#4a4a4a"   # gris neutro — zona referencia
-COLOR_MORENA    = "#C1272D"   # rojo Morena (alias de COLOR_ALTA)
+# ── Paleta de color — Identidad oficial Morena ────────────────────────────────
+COLOR_ALTA      = "#6A1B29"   # guinda Morena — prioridad alta, bordes card
+COLOR_ACENTO    = "#E6D194"   # dorado claro — labels de acento sobre fondo oscuro
+COLOR_MEDIA     = "#A57F2C"   # dorado oscuro — prioridad media
+COLOR_BAJA      = "#555555"   # gris neutro — zona referencia
+COLOR_MORENA    = "#6A1B29"   # alias de COLOR_ALTA
 COLOR_POSITIVO  = "#3f7a52"   # verde — datos positivos
-COLOR_FONDO     = "#160808"   # negro-borgoña — fondo principal
-COLOR_TARJETA   = "#220e0e"   # borgoña muy oscuro — fondo de tarjetas
-COLOR_TEXTO     = "#f0e8e8"   # blanco cálido — texto principal
-COLOR_SECUNDARIO= "#b8a8a8"   # rosa grisáceo — texto secundario
+COLOR_FONDO     = "#0f0608"   # negro-vino — fondo principal
+COLOR_TARJETA   = "#1a0a0d"   # vino muy oscuro — fondo de tarjetas
+COLOR_TEXTO     = "#FFFFFF"   # blanco puro — máximo contraste
+COLOR_SECUNDARIO= "#C8C0C0"   # gris claro — texto secundario
 
 # Colores por nivel operativo (lenguaje cliente)
 COLOR_NIVEL = {
-    "P1_CERTEZA": "#C1272D",   # rojo Morena
-    "P2_ALTA":    "#C1272D",   # rojo Morena
-    "P3_MEDIA":   "#8B1A1A",   # borgoña
-    "P4_BAJA":    "#4a4a4a",   # gris
+    "P1_CERTEZA": COLOR_ACENTO,
+    "P2_ALTA":    COLOR_ACENTO,
+    "P3_MEDIA":   COLOR_MEDIA,
+    "P4_BAJA":    COLOR_BAJA,
 }
 
 # Traducción de niveles a lenguaje cliente
@@ -65,7 +66,7 @@ def verificar_acceso():
                    font-size:2rem; font-weight:400; margin:0 0 0.3rem;'>
             La Magdalena Contreras
         </h1>
-        <p style='color:{COLOR_ALTA}; font-size:0.9rem; margin-bottom:2.5rem;'>
+        <p style='color:{COLOR_ACENTO}; font-size:0.9rem; margin-bottom:2.5rem;'>
             Interna Morena 2026
         </p>
     </div>
@@ -119,15 +120,15 @@ def aplicar_estilos():
     }}
     .stButton > button {{
         background-color: {COLOR_ALTA};
-        color: #1a1a1a;
+        color: #FFFFFF;
         border: none;
         border-radius: 4px;
         font-weight: 600;
         font-size: 0.85rem;
     }}
     .stButton > button:hover {{
-        background-color: #d4923a;
-        color: #1a1a1a;
+        background-color: #531521;
+        color: #FFFFFF;
     }}
     .stSelectbox > div, .stMultiSelect > div {{
         background-color: {COLOR_TARJETA};
@@ -146,7 +147,7 @@ def aplicar_estilos():
 
 # ── Componente KPI ────────────────────────────────────────────────────────────
 def kpi(label, valor, delta="", color=None):
-    color = color or COLOR_ALTA
+    color = color or COLOR_ACENTO
     delta_html = f"<p style='color:{color};font-size:0.75rem;margin:4px 0 0;'>{delta}</p>" if delta else ""
     st.markdown(f"""
     <div style='background:{COLOR_TARJETA}; border-left:4px solid {color};
@@ -186,13 +187,13 @@ def header(titulo, subtitulo=""):
         st.markdown(f"""
         <div style='text-align:right; padding-top:0.5rem;'>
             <p style='color:{COLOR_SECUNDARIO}; font-size:0.72rem; margin:0;'>{usuario}</p>
-            <p style='color:{COLOR_ALTA}; font-size:0.72rem; margin:0;'>
+            <p style='color:{COLOR_ACENTO}; font-size:0.72rem; margin:0;'>
                 {max(dias,0)} días restantes
             </p>
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown(f"<hr style='border:none;border-top:1px solid #2a3550;margin:0.5rem 0 1rem;'>",
+    st.markdown(f"<hr style='border:none;border-top:1px solid #3a1010;margin:0.5rem 0 1rem;'>",
                 unsafe_allow_html=True)
 
 # ── Carga de datos con caché ───────────────────────────────────────────────────
@@ -213,25 +214,25 @@ def cargar_ranking():
                          "data/pie_010_mc_ranking.csv", nrows=0).columns else {})
     return df
 
-# ── Color por IRE continuo (gradiente gris claro → rojo Morena) ─────────────
+# ── Color por IRE continuo (gradiente gris claro → guinda Morena) ────────────
 def color_ire(valor, vmin=0.0, vmax=1.0):
-    """Interpola entre gris claro y rojo Morena según el IRE.
+    """Interpola entre gris claro y guinda Morena según el IRE.
     Diseñado para mapas con fondo CartoDB positron (claro).
     """
     if valor is None or pd.isna(valor):
         return "#cccccc"
     t = max(0.0, min(1.0, (valor - vmin) / (vmax - vmin + 1e-9)))
-    # gris claro (#cccccc) → rojo Morena (#C1272D)
-    r = int(0xcc + t*(0xC1 - 0xcc))
-    g = int(0xcc + t*(0x27 - 0xcc))
-    b = int(0xcc + t*(0x2D - 0xcc))
+    # gris claro (#cccccc) → guinda Morena (#6A1B29)
+    r = int(0xcc + t*(0x6A - 0xcc))
+    g = int(0xcc + t*(0x1B - 0xcc))
+    b = int(0xcc + t*(0x29 - 0xcc))
     return f"#{r:02x}{g:02x}{b:02x}"
 
 # ── Badge de nivel ────────────────────────────────────────────────────────────
 def badge_nivel(nivel):
     col = COLOR_NIVEL.get(nivel, COLOR_BAJA)
     label = NIVEL_LABEL.get(nivel, nivel)
-    return f"<span style='background:{col};color:#1a1a1a;padding:2px 8px;border-radius:3px;font-size:0.75rem;font-weight:600;'>{label}</span>"
+    return f"<span style='background:{col};color:#1a0a0d;padding:2px 8px;border-radius:3px;font-size:0.75rem;font-weight:600;'>{label}</span>"
 
 # ── Determinar si sección es núcleo ──────────────────────────────────────────
 def es_nucleo(rank_estrategico):

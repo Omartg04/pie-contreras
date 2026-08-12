@@ -6,7 +6,7 @@ import streamlit as st
 from app_utils import (
     verificar_acceso, aplicar_estilos, header, kpi,
     cargar_ranking, cargar_unificado,
-    COLOR_ALTA, COLOR_MEDIA, COLOR_BAJA, COLOR_MORENA,
+    COLOR_ALTA, COLOR_ACENTO, COLOR_MEDIA, COLOR_BAJA, COLOR_MORENA,
     COLOR_TARJETA, COLOR_TEXTO, COLOR_SECUNDARIO, COLOR_POSITIVO,
     NIVEL_LABEL, badge_nivel, es_nucleo
 )
@@ -26,7 +26,7 @@ if not verificar_acceso():
 with st.sidebar:
     st.markdown(f"""
     <div style='padding:1rem 0 0.5rem;'>
-        <p style='color:{COLOR_ALTA}; font-size:0.72rem; letter-spacing:0.12em;
+        <p style='color:{COLOR_ACENTO}; font-size:0.72rem; letter-spacing:0.12em;
                   text-transform:uppercase; margin:0;'>PIE</p>
         <p style='color:{COLOR_TEXTO}; font-size:1rem; font-weight:600; margin:0.2rem 0;'>
             La Magdalena Contreras
@@ -153,14 +153,14 @@ with col_info:
         <p style='color:{COLOR_TEXTO}; font-weight:600; margin:0 0 0.5rem;'>
             Tres números en el encabezado de cada sección:
         </p>
-        <p><span style='color:{COLOR_ALTA}; font-weight:600;'>Prob. encuesta</span><br>
+        <p><span style='color:{COLOR_ACENTO}; font-weight:600;'>Prob. encuesta</span><br>
         En cuántas de cada 10 simulaciones cayó esta sección en la muestra.
         Un valor de 0.72 significa 7 de cada 10.</p>
-        <p><span style='color:{COLOR_ALTA}; font-weight:600;'>Fuerza Morena</span><br>
+        <p><span style='color:{COLOR_ACENTO}; font-weight:600;'>Fuerza Morena</span><br>
         % de electores del padrón que votaron por el bloque en 2024.
         No sobre quienes votaron — sobre el total registrado.</p>
         <p style='margin-bottom:0;'>
-        <span style='color:{COLOR_ALTA}; font-weight:600;'>Índice Rentabilidad</span><br>
+        <span style='color:{COLOR_ACENTO}; font-weight:600;'>Índice Rentabilidad</span><br>
         Combina los dos anteriores. Ordena las secciones del PDF de mayor
         a menor impacto operativo.</p>
     </div>
@@ -175,11 +175,11 @@ with col_info:
         <p style='color:{COLOR_TEXTO}; font-weight:600; margin:0 0 0.5rem;'>
             Contexto electoral — Alcaldía 2024
         </p>
-        <p>Morena ganó por <span style='color:{COLOR_ALTA};font-weight:600;'>+1.96 pp</span>
+        <p>Morena ganó por <span style='color:{COLOR_ACENTO};font-weight:600;'>+1.96 pp</span>
         sobre la oposición. Cuarta alternancia consecutiva.</p>
         <p style='margin-bottom:0;'>
         En las 52 secciones de mayor padrón (S1), Morena tiene
-        <span style='color:{COLOR_ALTA};font-weight:600;'>+11.1 pp</span>
+        <span style='color:{COLOR_ACENTO};font-weight:600;'>+11.1 pp</span>
         de ventaja. Ahí se concentra el operativo.</p>
     </div>
     """, unsafe_allow_html=True)

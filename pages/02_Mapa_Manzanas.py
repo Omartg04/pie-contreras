@@ -11,7 +11,7 @@ from app_utils import (
     verificar_acceso, aplicar_estilos, header, kpi,
     cargar_unificado, cargar_ranking,
     color_ire,
-    COLOR_ALTA, COLOR_MEDIA, COLOR_BAJA, COLOR_MORENA,
+    COLOR_ALTA, COLOR_ACENTO, COLOR_MEDIA, COLOR_BAJA, COLOR_MORENA,
     COLOR_TARJETA, COLOR_TEXTO, COLOR_SECUNDARIO,
     PROYECTO,
 )
@@ -30,7 +30,7 @@ if not verificar_acceso():
 with st.sidebar:
     st.markdown(f"""
     <div style='padding:1rem 0 0.5rem;'>
-        <p style='color:{COLOR_ALTA};font-size:0.72rem;letter-spacing:0.12em;
+        <p style='color:{COLOR_ACENTO};font-size:0.72rem;letter-spacing:0.12em;
                   text-transform:uppercase;margin:0;'>PIE</p>
         <p style='color:{COLOR_TEXTO};font-size:1rem;font-weight:600;margin:0.2rem 0;'>
             La Magdalena Contreras</p>
@@ -212,7 +212,7 @@ with col_panel:
             <span style='color:{COLOR_SECUNDARIO};font-size:0.78rem;'>Manzana destacada ★</span>
         </div>
         <div style='display:flex;align-items:center;gap:8px;'>
-            <div style='width:14px;height:14px;background:#2e3a52;border-radius:2px;flex-shrink:0;'></div>
+            <div style='width:14px;height:14px;background:#555555;border-radius:2px;flex-shrink:0;'></div>
             <span style='color:{COLOR_SECUNDARIO};font-size:0.78rem;'>Sin prioridad</span>
         </div>
         <p style='color:{COLOR_SECUNDARIO};font-size:0.70rem;margin:0.8rem 0 0;line-height:1.5;'>
