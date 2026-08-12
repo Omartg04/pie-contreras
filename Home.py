@@ -117,84 +117,46 @@ with c4:
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ── Franja de contexto — universo de priorización ────────────────────────────
-st.markdown(f"""
-<div style='background:{COLOR_TARJETA}; border:1px solid #3a1010; border-radius:8px;
-            padding:1rem 1.5rem; margin-bottom:1.2rem;'>
-    <p style='color:{COLOR_SECUNDARIO}; font-size:0.72rem; letter-spacing:0.1em;
-              text-transform:uppercase; margin:0 0 0.8rem;'>
-        Universo de priorización — La Magdalena Contreras
-    </p>
-    <div style='display:flex; align-items:center; gap:0; flex-wrap:wrap;'>
+# Usar columnas nativas de Streamlit para evitar problemas de rendering HTML complejo
 
-        <div style='text-align:center; padding:0 1.2rem;'>
-            <p style='color:{COLOR_TEXTO}; font-family:"Barlow Condensed",sans-serif;
-                      font-size:2rem; font-weight:700; margin:0; line-height:1;'>
-                {total_secs}
-            </p>
-            <p style='color:{COLOR_SECUNDARIO}; font-size:0.75rem; margin:3px 0 0;'>
-                secciones totales
-            </p>
-        </div>
+def _celda(numero, label, sublabel="", color="#FFFFFF"):
+    return f"""<div style='text-align:center; padding:0.6rem 0.2rem;'>
+        <p style='color:{color}; font-family:"Barlow Condensed",sans-serif;
+                  font-size:2rem; font-weight:700; margin:0; line-height:1;'>{numero}</p>
+        <p style='color:#C8C0C0; font-size:0.74rem; margin:3px 0 0;'>{label}</p>
+        <p style='color:#555555; font-size:0.68rem; margin:1px 0 0;'>{sublabel}</p>
+    </div>"""
 
-        <p style='color:#3a1010; font-size:1.8rem; margin:0; padding:0 0.2rem;'>→</p>
+def _flecha(simbolo="→"):
+    return f"""<div style='text-align:center; padding:0.6rem 0; color:#8a4a52;
+                font-size:1.4rem; font-weight:300;'>{simbolo}</div>"""
 
-        <div style='text-align:center; padding:0 1.2rem;
-                    border-left:2px solid #3a1010; border-right:2px solid #3a1010;'>
-            <p style='color:{COLOR_ACENTO}; font-family:"Barlow Condensed",sans-serif;
-                      font-size:2rem; font-weight:700; margin:0; line-height:1;'>
-                {len(p3)}
-            </p>
-            <p style='color:{COLOR_SECUNDARIO}; font-size:0.75rem; margin:3px 0 0;'>
-                secciones operativas
-            </p>
-            <p style='color:{COLOR_BAJA}; font-size:0.68rem; margin:1px 0 0;'>
-                mayor probabilidad de encuesta
-            </p>
-        </div>
+st.markdown(f"<p style='color:{COLOR_SECUNDARIO}; font-size:0.72rem; letter-spacing:0.1em; text-transform:uppercase; margin:0 0 0.4rem;'>Universo de priorización — La Magdalena Contreras</p>", unsafe_allow_html=True)
 
-        <p style='color:#3a1010; font-size:1.8rem; margin:0; padding:0 0.2rem;'>→</p>
+_BG = f"background:{COLOR_TARJETA}; border:1px solid #3a1010; border-radius:6px; padding:0.3rem 0.5rem;"
 
-        <div style='text-align:center; padding:0 1.2rem;'>
-            <p style='color:{COLOR_ALTA}; font-family:"Barlow Condensed",sans-serif;
-                      font-size:2rem; font-weight:700; margin:0; line-height:1;'>
-                {len(nucl)}
-            </p>
-            <p style='color:{COLOR_SECUNDARIO}; font-size:0.75rem; margin:3px 0 0;'>
-                núcleo prioritario
-            </p>
-            <p style='color:{COLOR_BAJA}; font-size:0.68rem; margin:1px 0 0;'>
-                mayor rentabilidad territorial
-            </p>
-        </div>
+c1, c2, c3, c4, c5, c6, c7, c8 = st.columns([2, 0.6, 2, 0.6, 2, 0.6, 2, 2])
 
-        <p style='color:#3a1010; font-size:1.8rem; margin:0; padding:0 0.2rem;'>+</p>
-
-        <div style='text-align:center; padding:0 1.2rem;'>
-            <p style='color:{COLOR_MEDIA}; font-family:"Barlow Condensed",sans-serif;
-                      font-size:2rem; font-weight:700; margin:0; line-height:1;'>
-                {len(extension)}
-            </p>
-            <p style='color:{COLOR_SECUNDARIO}; font-size:0.75rem; margin:3px 0 0;'>
-                extensión operativa
-            </p>
-            <p style='color:{COLOR_BAJA}; font-size:0.68rem; margin:1px 0 0;'>
-                cobertura complementaria
-            </p>
-        </div>
-
-        <div style='margin-left:auto; text-align:right; padding-left:1rem;
-                    border-left:1px solid #3a1010;'>
-            <p style='color:{COLOR_BAJA}; font-size:0.75rem; margin:0;'>
-                {len(referencia)} secciones de referencia
-            </p>
-            <p style='color:{COLOR_BAJA}; font-size:0.68rem; margin:2px 0 0;'>
-                proyección estadística · sin operación de campo
-            </p>
-        </div>
-
-    </div>
-</div>
-""", unsafe_allow_html=True)
+with c1:
+    st.markdown(f"<div style='{_BG}'>" + _celda(total_secs, "secciones totales", "", COLOR_TEXTO) + "</div>", unsafe_allow_html=True)
+with c2:
+    st.markdown(_flecha("→"), unsafe_allow_html=True)
+with c3:
+    st.markdown(f"<div style='{_BG}'>" + _celda(len(p3), "secciones operativas", "mayor prob. de encuesta", COLOR_ACENTO) + "</div>", unsafe_allow_html=True)
+with c4:
+    st.markdown(_flecha("→"), unsafe_allow_html=True)
+with c5:
+    st.markdown(f"<div style='{_BG}'>" + _celda(len(nucl), "núcleo prioritario", "mayor rentabilidad", COLOR_ALTA) + "</div>", unsafe_allow_html=True)
+with c6:
+    st.markdown(_flecha("+"), unsafe_allow_html=True)
+with c7:
+    st.markdown(f"<div style='{_BG}'>" + _celda(len(extension), "extensión operativa", "cobertura complementaria", COLOR_MEDIA) + "</div>", unsafe_allow_html=True)
+with c8:
+    st.markdown(f"""<div style='border-left:1px solid #3a1010; padding:0.6rem 0 0.6rem 0.8rem;'>
+        <p style='color:#555555; font-size:0.75rem; margin:0;'>{len(referencia)} de referencia</p>
+        <p style='color:#555555; font-size:0.68rem; margin:3px 0 0; line-height:1.4;'>
+            proyección estadística<br>sin operación de campo</p>
+    </div>""", unsafe_allow_html=True)
 
 # ── Dos columnas: top 10 + contexto ──────────────────────────────────────────
 col_tabla, col_info = st.columns([3, 2])
