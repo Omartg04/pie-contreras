@@ -341,52 +341,39 @@ with col_panel:
             kpi("Manzanas destacadas", str(n_dest),
                 "IRE alto fuera del corte de LN", COLOR_ACENTO)
 
-    # ── Leyenda — siempre visible ──────────────────────────────────────
-    st.markdown(f"""
-    <div style='background:{COLOR_TARJETA};border-radius:6px;
-                padding:0.9rem;margin-top:0.6rem;'>
-        <p style='color:{COLOR_TEXTO};font-size:0.82rem;font-weight:600;margin:0 0 0.7rem;'>
-            Leyenda
-        </p>
+    # ── Leyenda — en llamadas pequeñas para evitar raw HTML ─────────
+    st.markdown(f"<p style='color:{COLOR_TEXTO};font-size:0.82rem;font-weight:600;margin:0.8rem 0 0.5rem;'>Leyenda</p>", unsafe_allow_html=True)
 
-        <p style='color:{COLOR_SECUNDARIO};font-size:0.75rem;font-weight:600;margin:0 0 2px;'>
-            Manzanas prioritarias
-        </p>
-        <div style='background:linear-gradient(to right,#e8d5d5,#8B4A52,#6A1B29);
-                    height:9px;border-radius:4px;margin-bottom:3px;'></div>
-        <div style='display:flex;justify-content:space-between;margin-bottom:6px;'>
-            <span style='color:{COLOR_SECUNDARIO};font-size:0.68rem;'>Menor LN</span>
-            <span style='color:{COLOR_SECUNDARIO};font-size:0.68rem;'>Mayor LN</span>
-        </div>
-        <p style='color:{COLOR_SECUNDARIO};font-size:0.72rem;margin:0 0 6px;line-height:1.4;'>
-            Concentran el 50% de la lista nominal de su sección.
-            Destino principal de las brigadas de campo.
-        </p>
+    # Gradiente manzanas prioritarias
+    st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.75rem;font-weight:600;margin:0 0 2px;'>Manzanas prioritarias</p>", unsafe_allow_html=True)
+    st.markdown("<div style='background:linear-gradient(to right,#e8d5d5,#8B4A52,#6A1B29);height:9px;border-radius:4px;margin-bottom:2px;'></div>", unsafe_allow_html=True)
 
-        <div style='display:flex;align-items:center;gap:8px;margin-bottom:3px;'>
-            <div style='width:14px;height:14px;background:{COLOR_ACENTO};
-                        border-radius:2px;flex-shrink:0;'></div>
-            <span style='color:{COLOR_SECUNDARIO};font-size:0.75rem;font-weight:600;'>
-                Manzana destacada ★
-            </span>
-        </div>
-        <p style='color:{COLOR_SECUNDARIO};font-size:0.72rem;margin:0 0 6px;line-height:1.4;'>
-            Alta prob. de encuesta fuera del corte de LN —
-            hallazgo del modelo, no aparece en ranking estándar.
-        </p>
+    col_ln1, col_ln2 = st.columns(2)
+    with col_ln1:
+        st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.68rem;margin:0;'>Menor LN</p>", unsafe_allow_html=True)
+    with col_ln2:
+        st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.68rem;margin:0;text-align:right;'>Mayor LN</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.72rem;margin:4px 0 8px;line-height:1.4;'>Concentran el 50% de la LN de su sección. Destino de las brigadas.</p>", unsafe_allow_html=True)
 
-        <div style='display:flex;align-items:center;gap:8px;margin-bottom:3px;'>
-            <div style='width:14px;height:14px;background:#eeeeee;
-                        border:1px solid #ccc;border-radius:2px;flex-shrink:0;'></div>
-            <span style='color:{COLOR_SECUNDARIO};font-size:0.75rem;'>Resto de manzanas</span>
-        </div>
-        <p style='color:{COLOR_SECUNDARIO};font-size:0.72rem;margin:0 0 6px;line-height:1.4;'>
-            Contexto geográfico.
-        </p>
+    # Manzana destacada
+    col_ic, col_txt = st.columns([1, 5])
+    with col_ic:
+        st.markdown(f"<div style='width:14px;height:14px;background:{COLOR_ACENTO};border-radius:2px;margin-top:2px;'></div>", unsafe_allow_html=True)
+    with col_txt:
+        st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.75rem;font-weight:600;margin:0;'>Manzana destacada ★</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.72rem;margin:2px 0 8px;line-height:1.4;'>IRE alto fuera del corte de LN — hallazgo del modelo.</p>", unsafe_allow_html=True)
 
-        <div style='display:flex;align-items:center;gap:8px;'>
-            <div style='width:14px;height:3px;background:{COLOR_ALTA};flex-shrink:0;'></div>
-            <span style='color:{COLOR_SECUNDARIO};font-size:0.72rem;'>Contorno de sección</span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    # Resto de manzanas
+    col_ic2, col_txt2 = st.columns([1, 5])
+    with col_ic2:
+        st.markdown("<div style='width:14px;height:14px;background:#eeeeee;border:1px solid #ccc;border-radius:2px;margin-top:2px;'></div>", unsafe_allow_html=True)
+    with col_txt2:
+        st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.75rem;margin:0;'>Resto de manzanas</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.72rem;margin:2px 0 8px;line-height:1.4;'>Contexto geográfico.</p>", unsafe_allow_html=True)
+
+    # Contorno sección
+    col_ic3, col_txt3 = st.columns([1, 5])
+    with col_ic3:
+        st.markdown(f"<div style='width:14px;height:3px;background:{COLOR_ALTA};margin-top:6px;'></div>", unsafe_allow_html=True)
+    with col_txt3:
+        st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.72rem;margin:0;'>Contorno de sección</p>", unsafe_allow_html=True)
