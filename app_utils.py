@@ -225,7 +225,7 @@ def header(titulo, subtitulo=""):
         <div style='margin-bottom:0.5rem;'>
             <p style='color:{COLOR_SECUNDARIO}; font-size:0.72rem; letter-spacing:0.12em;
                       text-transform:uppercase; margin:0;'>
-                PIE · {PROYECTO["municipio"]} · Interna Morena 2026
+                PIE · {PROYECTO["municipio"]} · Bernardo Aguilar 2027
             </p>
             <h1 style='color:{COLOR_TEXTO}; margin:0.1rem 0 0; font-size:1.7rem;'>
                 {titulo}
