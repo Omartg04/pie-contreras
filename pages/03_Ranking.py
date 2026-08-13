@@ -30,6 +30,8 @@ with st.sidebar:
                   text-transform:uppercase;margin:0;'>PIE</p>
         <p style='color:{COLOR_TEXTO};font-size:1rem;font-weight:600;margin:0.2rem 0;'>
             La Magdalena Contreras</p>
+        <p style='color:{COLOR_ACENTO};font-weight:600; font-size:0.78rem; margin:0;'>
+            Bernardo Aguilar 2027
     </div>
     <hr style='border:none;border-top:1px solid #3a1010;margin:0.8rem 0;'>
     """, unsafe_allow_html=True)
