@@ -279,6 +279,41 @@ with col_info:
     </div>
     """, unsafe_allow_html=True)
 
+# ── Nota metodológica ────────────────────────────────────────────────────────
+st.markdown("<br>", unsafe_allow_html=True)
+with st.expander("📋  Notas sobre los datos y alcance del modelo", expanded=False):
+    st.markdown(f"""
+    <div style='font-size:0.82rem; color:{COLOR_SECUNDARIO}; line-height:1.7;'>
+        <p style='color:{COLOR_TEXTO}; font-weight:600; margin:0 0 0.5rem;'>
+            Fuentes y fecha de corte
+        </p>
+        <p>Lista Nominal INE · julio 2026 &nbsp;·&nbsp;
+           INEGI Censo 2020 &nbsp;·&nbsp;
+           CONAPO proyecciones 2026 &nbsp;·&nbsp;
+           IECM resultados 2024 &nbsp;·&nbsp;
+           Monte Carlo 30 diseños × 10,000 iteraciones · Semilla 42</p>
+        <p style='color:{COLOR_TEXTO}; font-weight:600; margin:0.8rem 0 0.5rem;'>
+            Alcance del modelo
+        </p>
+        <p>La probabilidad de encuesta identifica unidades con certeza o alta robustez de
+           inclusión bajo la familia de diseños muestrales probabilísticos estándar del
+           mercado (PPT sobre lista nominal, muestreo en vivienda, dos o tres etapas).
+           No cubre diseños atípicos: cuotas en puntos de afluencia, muestras
+           telefónicas o paneles en línea.</p>
+        <p style='color:{COLOR_TEXTO}; font-weight:600; margin:0.8rem 0 0.5rem;'>
+            Brecha cartográfica conocida
+        </p>
+        <p>La sección <strong style='color:{COLOR_ACENTO};'>3072</strong> está presente
+           en el ranking operativo porque tiene electores registrados en la lista nominal,
+           pero no tiene manzanas asignadas en el modelo cartográfico (sin intersección
+           válida con el marco geoestadístico INEGI 2020). En el mapa de manzanas y en
+           las fichas individuales esta sección muestra ceros — no es un error de la
+           plataforma sino una brecha en los datos de origen, documentada en la memoria
+           de método del caso. El mapa de campo imprimible de esta sección no está
+           disponible en esta versión.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
 # ── Footer ────────────────────────────────────────────────────────────────────
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown(f"""

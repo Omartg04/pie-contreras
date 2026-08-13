@@ -1,6 +1,7 @@
 """
 03_Ranking.py — PIE · Fichas de Sección y Ranking operativo
 """
+import re
 import streamlit as st
 import pandas as pd
 import io
@@ -84,22 +85,37 @@ p3["ln_mzas"] = p3["ln_mzas"].fillna(0)
 p3["pct_cub"] = p3.apply(
     lambda r: r["ln_mzas"] / r["LN_TOTAL"] * 100 if r["LN_TOTAL"] > 0 else 0, axis=1)
 
-# Orden de secciones en el PDF (ascendente por clave)
+# PDF de hojas de campo
 PDF_PATH = "assets/pie_010_mc_hojas_campo.pdf"
-secciones_pdf = sorted(p3["SECCION"].tolist())
 
-def _extraer_pagina_pdf(seccion_id):
-    """Extrae la hoja de campo de una sección del PDF consolidado."""
-    try:
-        idx = secciones_pdf.index(seccion_id)
-        reader = PdfReader(PDF_PATH)
-        writer = PdfWriter()
-        writer.add_page(reader.pages[idx])
-        buf = io.BytesIO()
-        writer.write(buf)
-        return buf.getvalue()
-    except (ValueError, IndexError, FileNotFoundError):
+@st.cache_resource
+def _indice_pdf() -> dict:
+    """
+    Lee el PDF una vez y construye {seccion_id: indice_pagina_0based}.
+    No asume orden de páginas — mapeo por texto del encabezado de cada hoja.
+    El PDF tiene 58 páginas (sección 3072 sin manzanas en el pipeline, no incluida).
+    """
+    reader = PdfReader(PDF_PATH)
+    patron = re.compile(r"Secci[oó]n[:\s]*(\d{4,5})", re.IGNORECASE)
+    indice = {}
+    for i, page in enumerate(reader.pages):
+        texto = page.extract_text(extraction_mode="layout") or ""
+        match = patron.search(texto)
+        if match:
+            indice[int(match.group(1))] = i
+    return indice
+
+def _extraer_pagina_pdf(seccion_id: int) -> bytes | None:
+    """Extrae la hoja de campo de una sección usando el índice real del PDF."""
+    indice = _indice_pdf()
+    if seccion_id not in indice:
         return None
+    reader = PdfReader(PDF_PATH)
+    writer = PdfWriter()
+    writer.add_page(reader.pages[indice[seccion_id]])
+    buf = io.BytesIO()
+    writer.write(buf)
+    return buf.getvalue()
 
 # ── Tabs — Ficha primero ──────────────────────────────────────────────────────
 tab_ficha, tab_rank, tab_descarga = st.tabs(
@@ -251,17 +267,20 @@ with tab_ficha:
                         f"LN cubierta: {int(row_sec.get('ln_mzas',0)):,}</p>",
                         unsafe_allow_html=True)
 
-            pdf_pagina = _extraer_pagina_pdf(sec_sel)
+            pdf_pagina = _extraer_pagina_pdf(int(sec_sel))
             if pdf_pagina:
                 st.download_button(
-                    label=f"⬇  Descargar mapa sección {int(sec_sel)}",
+                    label=f"⬇  Mapa de campo — Sección {int(sec_sel)}",
                     data=pdf_pagina,
                     file_name=f"pie_010_mapa_seccion_{int(sec_sel)}.pdf",
                     mime="application/pdf",
                     use_container_width=True,
                 )
             else:
-                st.info("Mapa de campo no disponible aún.")
+                st.caption(
+                    f"Mapa de campo no disponible para sección {int(sec_sel)} "
+                    "(sin cobertura cartográfica en el pipeline)."
+                )
 
 # ════════════════════════════════════════════════════════════════════════════
 with tab_rank:

@@ -312,6 +312,20 @@ with col_panel:
         </div>
         """, unsafe_allow_html=True)
 
+        if len(mzas_sec) == 0:
+            st.markdown(
+                f"<div style='background:#2a1010;border-left:3px solid {COLOR_MEDIA};"
+                f"border-radius:4px;padding:0.6rem 0.8rem;margin-bottom:0.6rem;'>"
+                f"<p style='color:{COLOR_ACENTO};font-size:0.78rem;font-weight:600;margin:0 0 2px;'>"
+                f"Sin cobertura cartográfica</p>"
+                f"<p style='color:{COLOR_SECUNDARIO};font-size:0.74rem;margin:0;line-height:1.5;'>"
+                f"Esta sección está en el ranking porque tiene electores en la lista nominal, "
+                f"pero no tiene manzanas asignadas en el modelo cartográfico del pipeline. "
+                f"El mapa de campo no está disponible.</p>"
+                f"</div>",
+                unsafe_allow_html=True,
+            )
+
         kpi("LN total de la sección", f"{int(ln_sec):,}", color=COLOR_MEDIA)
         kpi("Manzanas prioritarias",  str(n_prio),        color=COLOR_ALTA)
         kpi("LN en manzanas prio.",   f"{int(ln_prio):,}", color=COLOR_ALTA)
