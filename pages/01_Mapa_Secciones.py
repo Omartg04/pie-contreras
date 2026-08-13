@@ -73,6 +73,28 @@ with st.sidebar:
     st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.76rem;line-height:1.5;margin-top:0.3rem;'>{descripciones[capa_color]}</p>",
                 unsafe_allow_html=True)
 
+    st.markdown("<div style='height:0.5rem'></div>", unsafe_allow_html=True)
+
+    # ── Selector de sección — zoom sin cambiar filtros ────────────────
+    def _label_sec(s):
+        row = rank[rank["SECCION"]==s]
+        if row.empty or row.iloc[0]["NIVEL_PRIORIDAD_OP"] != "P3_MEDIA":
+            return f"Sección {s} — Referencia"
+        rnk = int(row.iloc[0]["RANK_ESTRATEGICO"])
+        tag = f"★ Núcleo #{rnk}" if rnk <= 26 else f"Extensión #{rnk}"
+        return f"Sección {s} — {tag}"
+
+    secs_todas = sorted(rank[rank["SECCION"]>0]["SECCION"].tolist())
+    opciones_zoom = ["— Sin zoom específico"] + [_label_sec(s) for s in secs_todas]
+    sec_id_map    = {_label_sec(s): s for s in secs_todas}
+
+    zoom_sel_label = st.selectbox("Ir a una sección", options=opciones_zoom, index=0)
+    zoom_sec = sec_id_map.get(zoom_sel_label)  # None si no hay selección
+
+    st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.73rem;line-height:1.4;"
+                f"margin-top:0.2rem;'>El zoom ubica la sección en el mapa sin cambiar "
+                f"los colores ni los filtros activos.</p>", unsafe_allow_html=True)
+
     st.markdown("<hr style='border:none;border-top:1px solid #3a1010;margin:1rem 0;'>",
                 unsafe_allow_html=True)
     if st.button("Cerrar sesión", use_container_width=True):
@@ -138,6 +160,14 @@ col_val = col_map[capa_color]
 vals = secs_vis[col_val].dropna()
 vmin = float(vals.min()) if len(vals) else 0.0
 vmax = float(vals.max()) if len(vals) else 1.0
+
+# ── Zoom automático si hay sección seleccionada ──────────────────────────────
+if zoom_sec:
+    mzas_zoom = gdf[gdf["SECCION"] == zoom_sec] if "gdf" in dir() else None
+    sec_zoom  = secs_m[secs_m["SECCION"] == zoom_sec]
+    if not sec_zoom.empty:
+        bounds = sec_zoom.total_bounds  # [minx, miny, maxx, maxy]
+        m.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
 
 # ── Barra de color en el mapa (branca colormap) ───────────────────────────────
 colormap = cm.LinearColormap(
