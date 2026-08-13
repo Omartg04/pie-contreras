@@ -27,6 +27,11 @@ aplicar_estilos()
 if not verificar_acceso():
     st.stop()
 
+# ── Cargar datos (antes del sidebar — el selector de sección los necesita) ────
+rank = cargar_ranking()
+secs = cargar_secciones()
+gdf  = cargar_unificado()
+
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown(f"""
@@ -104,10 +109,7 @@ with st.sidebar:
 # ── Header ────────────────────────────────────────────────────────────────────
 header("Mapa de Secciones", "Distribución territorial de la priorización operativa")
 
-# ── Cargar datos ──────────────────────────────────────────────────────────────
-rank = cargar_ranking()
-secs = cargar_secciones()
-gdf  = cargar_unificado()   # para manzanas prioritarias por sección
+# ── Datos ya cargados antes del sidebar ──────────────────────────────────────
 
 p3 = rank[(rank["NIVEL_PRIORIDAD_OP"]=="P3_MEDIA") & (rank["SECCION"]>0)].copy()
 p3["es_nucleo"] = p3["RANK_ESTRATEGICO"].apply(lambda r: r <= 26)  # proxy ocupa #1
