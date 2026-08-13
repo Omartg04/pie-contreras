@@ -301,16 +301,23 @@ with st.expander("📋  Notas sobre los datos y alcance del modelo", expanded=Fa
            No cubre diseños atípicos: cuotas en puntos de afluencia, muestras
            telefónicas o paneles en línea.</p>
         <p style='color:{COLOR_TEXTO}; font-weight:600; margin:0.8rem 0 0.5rem;'>
-            Brecha cartográfica conocida
+            Brecha cartográfica conocida — Sección 3072
         </p>
-        <p>La sección <strong style='color:{COLOR_ACENTO};'>3072</strong> está presente
-           en el ranking operativo porque tiene electores registrados en la lista nominal,
-           pero no tiene manzanas asignadas en el modelo cartográfico (sin intersección
-           válida con el marco geoestadístico INEGI 2020). En el mapa de manzanas y en
-           las fichas individuales esta sección muestra ceros — no es un error de la
-           plataforma sino una brecha en los datos de origen, documentada en la memoria
-           de método del caso. El mapa de campo imprimible de esta sección no está
-           disponible en esta versión.</p>
+        <p>La sección <strong style='color:{COLOR_ACENTO};'>3072</strong>
+           (ranking #14 · 1,773 electores) está presente en el ranking operativo
+           con todos sus indicadores correctos — probabilidad de encuesta, fuerza
+           Morena e índice de rentabilidad — porque estos se calculan a nivel de
+           sección desde la lista nominal.</p>
+        <p>Lo que no está disponible es la <strong>guía de manzanas</strong>:
+           el modelo cartográfico no le asignó manzanas del marco geoestadístico
+           INEGI 2020, por lo que no existe mapa de campo imprimible ni
+           priorización por bloque para esta sección. No es un error de la
+           plataforma — es una brecha en los datos de origen.</p>
+        <p><strong style='color:{COLOR_ACENTO};'>Indicación para el coordinador de
+           sección 3072:</strong> cubrir la sección completa usando el polígono
+           visible en el Mapa de Secciones como referencia geográfica. Con
+           1,773 electores en el contexto de una interna, la cobertura total
+           de la sección es operativamente viable sin priorización por manzana.</p>
     </div>
     """, unsafe_allow_html=True)
 
