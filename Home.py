@@ -283,7 +283,7 @@ with col_info:
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown(f"""
 <p style='color:{COLOR_BAJA}; font-size:0.72rem; text-align:center;'>
-    PIE · Plataforma de Inteligencia Electoral · La Magdalena Contreras · Interna Morena 2026<br>
+    PIE · Plataforma de Inteligencia Electoral · La Magdalena Contreras · Bernardo Aguilar 2027<br>
     Data & AI Inclusion Technologies
 </p>
 """, unsafe_allow_html=True)
