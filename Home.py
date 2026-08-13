@@ -301,23 +301,27 @@ with st.expander("📋  Notas sobre los datos y alcance del modelo", expanded=Fa
            No cubre diseños atípicos: cuotas en puntos de afluencia, muestras
            telefónicas o paneles en línea.</p>
         <p style='color:{COLOR_TEXTO}; font-weight:600; margin:0.8rem 0 0.5rem;'>
-            Brecha cartográfica conocida — Sección 3072
+            Nota sobre cobertura cartográfica
         </p>
-        <p>La sección <strong style='color:{COLOR_ACENTO};'>3072</strong>
-           (ranking #14 · 1,773 electores) está presente en el ranking operativo
-           con todos sus indicadores correctos — probabilidad de encuesta, fuerza
-           Morena e índice de rentabilidad — porque estos se calculan a nivel de
-           sección desde la lista nominal.</p>
-        <p>Lo que no está disponible es la <strong>guía de manzanas</strong>:
-           el modelo cartográfico no le asignó manzanas del marco geoestadístico
-           INEGI 2020, por lo que no existe mapa de campo imprimible ni
-           priorización por bloque para esta sección. No es un error de la
-           plataforma — es una brecha en los datos de origen.</p>
-        <p><strong style='color:{COLOR_ACENTO};'>Indicación para el coordinador de
-           sección 3072:</strong> cubrir la sección completa usando el polígono
-           visible en el Mapa de Secciones como referencia geográfica. Con
-           1,773 electores en el contexto de una interna, la cobertura total
-           de la sección es operativamente viable sin priorización por manzana.</p>
+        <p>En julio de 2026, la lista nominal del INE para La Magdalena Contreras
+           registra <strong style='color:{COLOR_ACENTO};'>151 secciones</strong>.
+           La última versión disponible del mapa de secciones, publicada por el INE
+           en diciembre de 2025, no contempla aún el reseccionamiento más reciente.</p>
+        <p>Cuando el INE modifica los límites de una sección —lo que se llama
+           reseccionamiento— la lista nominal y el mapa se actualizan en momentos
+           distintos. Eso genera secciones que aparecen en el padrón pero que todavía
+           no tienen correspondencia en la cartografía ni en el marco de manzanas
+           que usa el modelo.</p>
+        <p>En este caso, la discrepancia afecta a
+           <strong style='color:{COLOR_ACENTO};'>una sola sección prioritaria:
+           la sección 3072</strong> (ranking #14 · 1,773 electores). La identificamos,
+           está incluida en el ranking con todos sus indicadores, pero no contamos
+           con el detalle de manzanas para generar su mapa de campo.</p>
+        <p><strong style='color:{COLOR_ACENTO};'>Indicación para el coordinador
+           de sección 3072:</strong> cubrir la sección completa usando el contorno
+           visible en el Mapa de Secciones como referencia. Con 1,773 electores
+           en el contexto de una interna, es operativamente viable sin necesidad
+           de priorizar por manzana.</p>
     </div>
     """, unsafe_allow_html=True)
 
