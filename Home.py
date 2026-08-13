@@ -32,7 +32,7 @@ with st.sidebar:
             La Magdalena Contreras
         </p>
         <p style='color:{COLOR_ACENTO};font-weight:600; font-size:0.78rem; margin:0;'>
-            Interna Morena 2026
+            Bernardo Aguilar 2027
         </p>
     </div>
     <hr style='border:none;border-top:1px solid #3a1010;margin:0.8rem 0;'>
@@ -41,7 +41,7 @@ with st.sidebar:
     st.page_link("Home.py",                      label="🏠  Inicio",               )
     st.page_link("pages/01_Mapa_Secciones.py",   label="🗺️  Mapa de secciones"     )
     st.page_link("pages/02_Mapa_Manzanas.py",    label="📍  Mapa de manzanas"      )
-    st.page_link("pages/03_Ranking.py",          label="🔍 Fichas de sección"       )
+    st.page_link("pages/03_Ranking.py",           label="🔍  Fichas de sección"       )
 
     st.markdown("<hr style='border:none;border-top:1px solid #3a1010;margin:1rem 0;'>",
                 unsafe_allow_html=True)

@@ -50,7 +50,7 @@ def fecha_es(d):
 PROYECTO = {
     "nombre":    "PIE — Plataforma de Inteligencia Electoral",
     "modulo":    "Módulo de Priorización Territorial",
-    "subtitulo": "Interna Morena 2026",
+    "subtitulo": "Bernardo Aguilar 2027",
     "municipio": "La Magdalena Contreras",
     "vigencia":  date(2026, 11, 12),
     "lat_centro": 19.298,
@@ -80,7 +80,7 @@ def verificar_acceso():
         </h1>
         <p style='color:{COLOR_ACENTO}; font-size:1rem; margin-bottom:2.5rem;
                   font-weight:600; letter-spacing:0.05em;'>
-            Interna Morena 2026
+            Bernardo Aguilar 2027
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -191,6 +191,10 @@ def aplicar_estilos():
         padding-bottom: 2rem !important;
     }}
     footer {{ visibility: hidden; }}
+    /* Ocultar navegación automática de Streamlit (visible en login) */
+    [data-testid="stSidebarNav"] {{
+        display: none !important;
+    }}
     </style>
     """, unsafe_allow_html=True)
 
