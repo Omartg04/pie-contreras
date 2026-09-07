@@ -250,6 +250,21 @@ def header(titulo, subtitulo=""):
     st.markdown(f"<hr style='border:none;border-top:1px solid #3a1010;margin:0.5rem 0 1rem;'>",
                 unsafe_allow_html=True)
 
+# ── Tiles de mapa — CARTO Basemaps con API key ───────────────────────────────
+def _carto_tiles():
+    """URL de tiles CartoDB Positron (fondo claro) con API key desde secrets."""
+    key = st.secrets.get("carto", {}).get("api_key", "")
+    return (
+        f"https://basemaps.cartocdn.com/rastertiles/light_all/{{z}}/{{x}}/{{y}}.png"
+        f"?key={key}"
+    )
+
+CARTO_TILES = _carto_tiles()
+CARTO_ATTR  = (
+    "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> "
+    "contributors © <a href='https://carto.com/attributions'>CARTO</a>"
+)
+
 # ── Carga de datos con caché ───────────────────────────────────────────────────
 @st.cache_data
 def cargar_unificado():
