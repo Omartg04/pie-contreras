@@ -14,7 +14,7 @@ from app_utils import (
     color_ire, badge_nivel, es_nucleo,
     COLOR_ALTA, COLOR_ACENTO, COLOR_MEDIA, COLOR_BAJA, COLOR_MORENA,
     COLOR_TARJETA, COLOR_TEXTO, COLOR_SECUNDARIO,
-    NIVEL_LABEL, PROYECTO,
+    NIVEL_LABEL, PROYECTO, CARTO_TILES, CARTO_ATTR,
 )
 
 st.set_page_config(
@@ -40,15 +40,13 @@ with st.sidebar:
                   text-transform:uppercase;margin:0;'>PIE</p>
         <p style='color:{COLOR_TEXTO};font-size:1rem;font-weight:600;margin:0.2rem 0;'>
             La Magdalena Contreras</p>
-        <p style='color:{COLOR_ACENTO};font-weight:600; font-size:0.78rem; margin:0;'>
-            Bernardo Aguilar 2027
     </div>
     <hr style='border:none;border-top:1px solid #3a1010;margin:0.8rem 0;'>
     """, unsafe_allow_html=True)
     st.page_link("Home.py",                      label="🏠  Inicio")
     st.page_link("pages/01_Mapa_Secciones.py",   label="🗺️  Mapa de secciones")
     st.page_link("pages/02_Mapa_Manzanas.py",    label="📍  Mapa de manzanas")
-    st.page_link("pages/03_Ranking.py",          label="🔍  Fichas de sección")
+    st.page_link("pages/03_Ranking.py",           label="🔍  Fichas de sección")
     st.markdown("<hr style='border:none;border-top:1px solid #3a1010;margin:1rem 0;'>",
                 unsafe_allow_html=True)
 
@@ -150,7 +148,8 @@ else:  # Todas (148) — default
 m = folium.Map(
     location=[PROYECTO["lat_centro"], PROYECTO["lon_centro"]],
     zoom_start=PROYECTO["zoom"],
-    tiles="CartoDB positron",
+    tiles=CARTO_TILES,
+    attr=CARTO_ATTR,
     control_scale=True,
 )
 

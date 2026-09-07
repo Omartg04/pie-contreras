@@ -13,7 +13,7 @@ from app_utils import (
     cargar_unificado, cargar_ranking, cargar_secciones,
     COLOR_ALTA, COLOR_ACENTO, COLOR_MEDIA, COLOR_BAJA, COLOR_MORENA,
     COLOR_TARJETA, COLOR_TEXTO, COLOR_SECUNDARIO,
-    PROYECTO,
+    PROYECTO, CARTO_TILES, CARTO_ATTR,
 )
 
 st.set_page_config(
@@ -59,15 +59,13 @@ with st.sidebar:
                   text-transform:uppercase;margin:0;'>PIE</p>
         <p style='color:{COLOR_TEXTO};font-size:1rem;font-weight:600;margin:0.2rem 0;'>
             La Magdalena Contreras</p>
-        <p style='color:{COLOR_ACENTO};font-weight:600; font-size:0.78rem; margin:0;'>
-            Bernardo Aguilar 2027
     </div>
     <hr style='border:none;border-top:1px solid #3a1010;margin:0.8rem 0;'>
     """, unsafe_allow_html=True)
     st.page_link("Home.py",                    label="🏠  Inicio")
     st.page_link("pages/01_Mapa_Secciones.py", label="🗺️  Mapa de secciones")
     st.page_link("pages/02_Mapa_Manzanas.py",  label="📍  Mapa de manzanas")
-    st.page_link("pages/03_Ranking.py",        label="🔍  Fichas de sección")
+    st.page_link("pages/03_Ranking.py",         label="🔍  Fichas de sección")
     st.markdown("<hr style='border:none;border-top:1px solid #3a1010;margin:1rem 0;'>",
                 unsafe_allow_html=True)
 
@@ -148,7 +146,8 @@ else:
 m = folium.Map(
     location=[lat_c, lon_c],
     zoom_start=15 if sec_sel else PROYECTO["zoom"],
-    tiles="CartoDB positron",
+    tiles=CARTO_TILES,
+    attr=CARTO_ATTR,
 )
 if fit_b:
     m.fit_bounds(fit_b)
@@ -311,20 +310,6 @@ with col_panel:
                          font-weight:600;padding:2px 7px;border-radius:3px;'>{tag}</span>
         </div>
         """, unsafe_allow_html=True)
-
-        if len(mzas_sec) == 0:
-            st.markdown(
-                f"<div style='background:#2a1010;border-left:3px solid {COLOR_MEDIA};"
-                f"border-radius:4px;padding:0.6rem 0.8rem;margin-bottom:0.6rem;'>"
-                f"<p style='color:{COLOR_ACENTO};font-size:0.78rem;font-weight:600;margin:0 0 2px;'>"
-                f"Sin cobertura cartográfica</p>"
-                f"<p style='color:{COLOR_SECUNDARIO};font-size:0.74rem;margin:0;line-height:1.5;'>"
-                f"Esta sección está en el ranking porque tiene electores en la lista nominal, "
-                f"pero no tiene manzanas asignadas en el modelo cartográfico del pipeline. "
-                f"El mapa de campo no está disponible.</p>"
-                f"</div>",
-                unsafe_allow_html=True,
-            )
 
         kpi("LN total de la sección", f"{int(ln_sec):,}", color=COLOR_MEDIA)
         kpi("Manzanas prioritarias",  str(n_prio),        color=COLOR_ALTA)
