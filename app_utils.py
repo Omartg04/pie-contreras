@@ -120,6 +120,7 @@ def aplicar_estilos():
     st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Barlow+Condensed:wght@400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
     /* ── Fondo global — capturar todos los niveles de Streamlit ── */
     .stApp, .stApp > div, .stApp > div > div,
