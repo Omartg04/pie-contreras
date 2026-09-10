@@ -288,6 +288,16 @@ def cargar_ranking():
                          "data/pie_010_mc_ranking.csv", nrows=0).columns else {})
     return df
 
+@st.cache_data
+def cargar_colonias():
+    """
+    Colonias (Unidades Territoriales IECM 2022) con indicadores agregados
+    desde el GeoJSON unificado — precomputado, no se hace spatial join en vivo.
+    Ver metodología del caso: join manzana→UT por área máxima de intersección.
+    """
+    gdf = gpd.read_file("data/pie_010_mc_colonias.geojson")
+    return gdf
+
 # ── Color por IRE continuo (gradiente gris claro → guinda Morena) ────────────
 def color_ire(valor, vmin=0.0, vmax=1.0):
     """Interpola entre gris claro y guinda Morena según el IRE.
