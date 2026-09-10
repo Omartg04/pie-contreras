@@ -298,6 +298,16 @@ def cargar_colonias():
     gdf = gpd.read_file("data/pie_010_mc_colonias.geojson")
     return gdf
 
+@st.cache_data
+def cargar_manzanas_colonia():
+    """
+    Manzanas del GeoJSON unificado, etiquetadas con su COLONIA (mismo join
+    precomputado que cargar_colonias()). Para dibujar el detalle de manzana
+    al hacer zoom dentro de una colonia seleccionada.
+    """
+    gdf = gpd.read_file("data/pie_010_mc_manzanas_colonia.geojson")
+    return gdf
+
 # ── Color por IRE continuo (gradiente gris claro → guinda Morena) ────────────
 def color_ire(valor, vmin=0.0, vmax=1.0):
     """Interpola entre gris claro y guinda Morena según el IRE.

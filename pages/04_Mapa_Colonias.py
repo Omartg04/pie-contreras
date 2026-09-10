@@ -8,10 +8,13 @@ Alcance: planeación/referencia/cobertura — sin seguimiento de ejecución en c
 import streamlit as st
 import folium
 import branca.colormap as cm
+import pandas as pd
+import geopandas as gpd
+import json
 from streamlit_folium import st_folium
 from app_utils import (
     verificar_acceso, aplicar_estilos, header, kpi,
-    cargar_colonias, PROYECTO,
+    cargar_colonias, cargar_manzanas_colonia, PROYECTO,
     COLOR_ALTA, COLOR_ACENTO, COLOR_MEDIA,
     COLOR_TARJETA, COLOR_TEXTO, COLOR_SECUNDARIO,
     CARTO_TILES, CARTO_ATTR,
@@ -106,18 +109,122 @@ m = folium.Map(
 for _, row in col_filt.iterrows():
     frase = (f"{row['COLONIA']}: {int(row['manzanas_prioritarias'])} manzanas "
              f"prioritarias de {int(row['total_manzanas'])}")
-    color = colormap(row["manzanas_prioritarias"])
     es_sel = (colonia_sel == row["COLONIA"])
+    color = colormap(row["manzanas_prioritarias"])
+    # Con colonia seleccionada: la colonia pasa a solo-contorno para no competir
+    # visualmente con el relleno de las manzanas que se dibujan encima.
+    fill_opacity = 0.0 if colonia_sel else 0.75
     folium.GeoJson(
         row["geometry"],
-        style_function=lambda _, c=color, sel=es_sel: {
+        style_function=lambda _, c=color, sel=es_sel, fo=fill_opacity: {
             "fillColor": c, "color": COLOR_ALTA if sel else "#3a1010",
-            "weight": 3 if sel else 0.8, "fillOpacity": 0.75,
+            "weight": 3 if sel else 0.8, "fillOpacity": fo,
         },
         tooltip=frase,
     ).add_to(m)
 
 colormap.add_to(m)
+
+# ── Capa de manzanas — solo dentro de la colonia seleccionada ────────────────
+if colonia_sel:
+    mz = cargar_manzanas_colonia()
+    mz_col = mz[mz["COLONIA"] == colonia_sel].copy()
+
+    mz_prio = mz_col[mz_col["es_prioritaria_s1"] == True]
+    mz_dest = mz_col[
+        (mz_col.get("NIVEL_MZA", pd.Series(dtype=str)) == "MA_ALTA") &
+        (mz_col["es_prioritaria_s1"] != True)
+    ] if "NIVEL_MZA" in mz_col.columns else pd.DataFrame()
+    mz_resto = mz_col[
+        (mz_col["es_prioritaria_s1"] != True) &
+        (~mz_col.index.isin(mz_dest.index))
+    ]
+
+    ln_vals = mz_prio["LN_estimada"].dropna()
+    ln_min = float(ln_vals.min()) if len(ln_vals) else 0.0
+    ln_max = float(ln_vals.max()) if len(ln_vals) else 1.0
+
+    def _fill_prio(ln):
+        if pd.isna(ln):
+            return "#8B4A52"
+        t = max(0.0, min(1.0, (ln - ln_min) / (ln_max - ln_min + 1e-9)))
+        r = int(0xe8 + t * (0x6A - 0xe8))
+        g = int(0xd5 + t * (0x1B - 0xd5))
+        b = int(0xd5 + t * (0x29 - 0xd5))
+        return f"#{r:02x}{g:02x}{b:02x}"
+
+    # Contexto — manzanas no prioritarias de la colonia (gris)
+    for _, r in mz_resto.iterrows():
+        try:
+            geom_json = json.loads(gpd.GeoSeries([r.geometry]).to_json())
+            folium.GeoJson(
+                geom_json,
+                style_function=lambda x: {
+                    "fillColor": "#eeeeee", "fillOpacity": 0.5,
+                    "color": "#cccccc", "weight": 0.3,
+                },
+            ).add_to(m)
+        except Exception:
+            pass
+
+    # Prioritarias — gradiente guinda por LN, mismo criterio que 02_Mapa_Manzanas.py
+    for _, r in mz_prio.iterrows():
+        ln_val = r.get("LN_estimada", 0)
+        rk_val = r.get("ranking_seccion", "?")
+        sec_val = int(r.get("SECCION", 0))
+        ire_str = f"{r.get('IRE_MZA', 0):.3f}" if "IRE_MZA" in r and pd.notna(r.get("IRE_MZA")) else "—"
+        fuente = r.get("fuente_estimacion", "—")
+        tooltip = f"""
+        <div style='font-family:sans-serif;font-size:12px;min-width:190px;'>
+            <b>M{int(rk_val) if pd.notna(rk_val) else '?'} — Manzana prioritaria</b><br>
+            Sección: {sec_val}<br>
+            <hr style='margin:3px 0;border:none;border-top:1px solid #ddd;'>
+            <b>LN estimada:</b> {ln_val:,.0f}<br>
+            <b>Prob. encuesta:</b> {ire_str}<br>
+            <b>Fuente estimación:</b> {fuente}
+        </div>
+        """
+        fill = _fill_prio(ln_val)
+        try:
+            geom_json = json.loads(gpd.GeoSeries([r.geometry]).to_json())
+            folium.GeoJson(
+                geom_json,
+                style_function=lambda x, f=fill: {
+                    "fillColor": f, "fillOpacity": 0.85,
+                    "color": "#3a0a0a", "weight": 1.2,
+                },
+                tooltip=folium.Tooltip(tooltip, sticky=True),
+            ).add_to(m)
+        except Exception:
+            pass
+
+    # Destacadas — dorado, mismo criterio que 02_Mapa_Manzanas.py
+    for _, r in mz_dest.iterrows():
+        ln_val = r.get("LN_estimada", 0)
+        sec_val = int(r.get("SECCION", 0))
+        rk_val = r.get("ranking_seccion", "?")
+        tooltip = f"""
+        <div style='font-family:sans-serif;font-size:12px;min-width:190px;'>
+            <b>★ Manzana destacada</b><br>
+            Sección: {sec_val} · Posición #{int(rk_val) if pd.notna(rk_val) else '?'}<br>
+            <hr style='margin:3px 0;border:none;border-top:1px solid #ddd;'>
+            <b>LN estimada:</b> {ln_val:,.0f}<br>
+            <b>Por qué aparece:</b> Alta probabilidad de encuesta fuera
+            del corte de lista nominal — hallazgo del modelo.
+        </div>
+        """
+        try:
+            geom_json = json.loads(gpd.GeoSeries([r.geometry]).to_json())
+            folium.GeoJson(
+                geom_json,
+                style_function=lambda x: {
+                    "fillColor": COLOR_ACENTO, "fillOpacity": 0.85,
+                    "color": "#7a6010", "weight": 1.5,
+                },
+                tooltip=folium.Tooltip(tooltip, sticky=True),
+            ).add_to(m)
+        except Exception:
+            pass
 
 if colonia_sel:
     geom_sel = col.loc[col["COLONIA"] == colonia_sel, "geometry"].values[0]
@@ -154,6 +261,13 @@ if colonia_sel:
                 f"Secciones: {row['secciones'] if row['secciones'] else '—'} · "
                 f"consulta la ficha de cada una en 🔍 Fichas de sección.</p>",
                 unsafe_allow_html=True)
+
+    st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.72rem;margin-top:0.6rem;'>"
+                f"En el mapa: <span style='color:#6A1B29;'>■</span> manzanas prioritarias "
+                f"(más oscuro = más electores) · "
+                f"<span style='color:{COLOR_ACENTO};'>■</span> manzanas destacadas (hallazgo "
+                f"del modelo, fuera del corte) · <span style='color:#cccccc;'>■</span> resto "
+                f"de manzanas de la colonia.</p>", unsafe_allow_html=True)
 
 else:
     st.markdown(f"<p style='color:{COLOR_TEXTO};font-size:0.9rem;font-weight:600;"
