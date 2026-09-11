@@ -143,6 +143,16 @@ def aplicar_estilos():
         color: {COLOR_TEXTO};
     }}
 
+    /* ── Restaurar la fuente de íconos internos de Streamlit ──
+       La regla de arriba (font-family: Inter !important) también pisa los
+       <span data-testid="stIconMaterial"> que Streamlit usa para su propia UI
+       (flecha del sidebar, ojo de contraseña, etc.), que dependen de la fuente
+       "Material Symbols Rounded" para mostrar el glifo en vez del nombre
+       del ícono como texto plano. Debe ir después de la regla anterior. */
+    [data-testid="stIconMaterial"] {{
+        font-family: 'Material Symbols Rounded' !important;
+    }}
+
     /* ── Headings ── */
     h1, h2, h3, h4, h5, h6,
     .stMarkdown h1, .stMarkdown h2, .stMarkdown h3,
