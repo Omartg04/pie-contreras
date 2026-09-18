@@ -14,7 +14,7 @@ import json
 from streamlit_folium import st_folium
 from app_utils import (
     verificar_acceso, aplicar_estilos, header, kpi,
-    cargar_colonias, cargar_manzanas_colonia, PROYECTO,
+    cargar_colonias, cargar_manzanas_colonia, cargar_secciones, PROYECTO,
     COLOR_ALTA, COLOR_ACENTO, COLOR_MEDIA,
     COLOR_TARJETA, COLOR_TEXTO, COLOR_SECUNDARIO,
     CARTO_TILES, CARTO_ATTR,
@@ -60,37 +60,91 @@ header("Mapa de Colonias", "Universo priorizado en el lenguaje que usa la brigad
 # ── Cargar datos ──────────────────────────────────────────────────────────────
 col = cargar_colonias()
 col = col.sort_values("COLONIA").reset_index(drop=True)
+mz_todas = cargar_manzanas_colonia()
+secs_geo = cargar_secciones()
 
 TOTAL_COLONIAS = len(col)
 TOTAL_CON_PRIO = int((col["manzanas_prioritarias"] > 0).sum())
 
-# ── Buscador de colonia (punto de entrada principal) ──────────────────────────
-opciones = ["— Panorama completo —"] + col["COLONIA"].tolist()
-colonia_sel = st.selectbox("Buscar colonia", options=opciones, index=0)
-colonia_sel = None if colonia_sel == "— Panorama completo —" else colonia_sel
+# Universo completo de secciones del caso (148/151, según catálogo del pipeline).
+# No todas tienen manzana mapeada a colonia — 3072/5654/5655/5656 son brechas
+# cartográficas ya documentadas (00b_brechas_cartograficas.md); se muestran en
+# el buscador igual, con un mensaje explícito en vez de desaparecer sin avisar.
+TODAS_LAS_SECCIONES = sorted(secs_geo[secs_geo["SECCION"] > 0]["SECCION"].tolist())
+SECCIONES_CON_COLONIA = set(mz_todas["SECCION"].unique().tolist())
 
-# ── Filtro narrativo (secundario) ──────────────────────────────────────────────
-col_f1, col_f2 = st.columns([1, 3])
-with col_f1:
-    universo = st.radio(
-        "Colonias a mostrar",
-        options=[f"Todas ({TOTAL_COLONIAS})", f"Con manzanas prioritarias ({TOTAL_CON_PRIO})"],
-        index=0,
+# ── Selector de modo de búsqueda ──────────────────────────────────────────────
+modo = st.radio("Buscar por", options=["Colonia", "Sección"], index=0, horizontal=True)
+
+colonia_sel = None
+sec_sel = None
+resumen_sec = None
+
+if modo == "Colonia":
+    # ── Buscador de colonia (punto de entrada principal) ──────────────────────
+    opciones = ["— Panorama completo —"] + col["COLONIA"].tolist()
+    colonia_sel = st.selectbox("Buscar colonia", options=opciones, index=0)
+    colonia_sel = None if colonia_sel == "— Panorama completo —" else colonia_sel
+
+    # ── Filtro narrativo (secundario) ──────────────────────────────────────────
+    col_f1, col_f2 = st.columns([1, 3])
+    with col_f1:
+        universo = st.radio(
+            "Colonias a mostrar",
+            options=[f"Todas ({TOTAL_COLONIAS})", f"Con manzanas prioritarias ({TOTAL_CON_PRIO})"],
+            index=0,
+        )
+    with col_f2:
+        st.markdown(f"""
+        <p style='color:{COLOR_SECUNDARIO};font-size:0.76rem;padding-top:1.8rem;'>
+            {'Incluye colonias sin universo operativo en este caso (referencia de cobertura).'
+             if universo.startswith('Todas')
+             else 'Solo colonias con al menos una manzana prioritaria a visitar.'}
+        </p>
+        """, unsafe_allow_html=True)
+
+    col_filt = col if universo.startswith("Todas") else col[col["manzanas_prioritarias"] > 0]
+
+    # El buscador siempre puede apuntar a cualquier colonia, aunque el filtro la excluya
+    if colonia_sel and colonia_sel not in col_filt["COLONIA"].values:
+        col_filt = col[col["COLONIA"] == colonia_sel]
+
+else:
+    # ── Buscador de sección — traduce en sentido inverso: sección → colonia(s) ──
+    sec_sel = st.selectbox(
+        "Buscar sección",
+        options=TODAS_LAS_SECCIONES,
+        format_func=lambda s: f"Sección {int(s)}",
+        index=None,
+        placeholder="Selecciona una sección...",
     )
-with col_f2:
-    st.markdown(f"""
-    <p style='color:{COLOR_SECUNDARIO};font-size:0.76rem;padding-top:1.8rem;'>
-        {'Incluye colonias sin universo operativo en este caso (referencia de cobertura).'
-         if universo.startswith('Todas')
-         else 'Solo colonias con al menos una manzana prioritaria a visitar.'}
-    </p>
-    """, unsafe_allow_html=True)
 
-col_filt = col if universo.startswith("Todas") else col[col["manzanas_prioritarias"] > 0]
-
-# El buscador siempre puede apuntar a cualquier colonia, aunque el filtro la excluya
-if colonia_sel and colonia_sel not in col_filt["COLONIA"].values:
-    col_filt = col[col["COLONIA"] == colonia_sel]
+    if sec_sel and sec_sel not in SECCIONES_CON_COLONIA:
+        # Brecha cartográfica conocida — sin manzanas mapeadas, no hay colonia que mostrar
+        st.warning(
+            f"La sección {int(sec_sel)} no tiene manzanas asignadas a colonia en este caso "
+            "(brecha cartográfica ya documentada — sin detalle de manzana en el pipeline). "
+            "Consulta su ficha en 🔍 Fichas de sección para la indicación operativa vigente.",
+            icon="⚠️",
+        )
+        col_filt = col.iloc[0:0]
+    elif sec_sel:
+        sec_mz = mz_todas[mz_todas["SECCION"] == sec_sel]
+        resumen_sec = (
+            sec_mz.groupby("COLONIA")
+            .agg(manzanas=("COLONIA", "count"),
+                 ln=("LN_estimada", "sum"),
+                 prioritarias=("es_prioritaria_s1", "sum"))
+            .reset_index()
+            .sort_values("manzanas", ascending=False)
+        )
+        resumen_sec["pct_manzanas"] = (
+            resumen_sec["manzanas"] / resumen_sec["manzanas"].sum() * 100
+        )
+        colonias_tocadas = resumen_sec["COLONIA"].tolist()
+        col_filt = col[col["COLONIA"].isin(colonias_tocadas)]
+    else:
+        col_filt = col.iloc[0:0]  # nada que dibujar hasta elegir sección
 
 # ── Mapa folium coroplético ─────────────────────────────────────────────────────
 vmax = max(int(col["manzanas_prioritarias"].max()), 1)
@@ -106,14 +160,29 @@ m = folium.Map(
     tiles=CARTO_TILES, attr=CARTO_ATTR,
 )
 
+# En modo Sección, las colonias tocadas pasan a solo-contorno — el protagonismo
+# visual es de la sección (borde grueso) y sus manzanas, no del relleno de colonia.
+solo_contorno = bool(colonia_sel) or (modo == "Sección" and sec_sel is not None)
+
+# Lookup rápido de manzanas/LN por colonia EN ESTA SECCIÓN, para un tooltip
+# más relevante que el total de la colonia cuando se busca por sección.
+resumen_sec_map = (
+    resumen_sec.set_index("COLONIA").to_dict("index")
+    if resumen_sec is not None else {}
+)
+
 for _, row in col_filt.iterrows():
-    frase = (f"{row['COLONIA']}: {int(row['manzanas_prioritarias'])} manzanas "
-             f"prioritarias de {int(row['total_manzanas'])}")
+    if row["COLONIA"] in resumen_sec_map:
+        r = resumen_sec_map[row["COLONIA"]]
+        frase = (f"{row['COLONIA']}: {int(r['manzanas'])} manzanas de la sección "
+                 f"{int(sec_sel)} ({r['pct_manzanas']:.0f}% de la sección) · "
+                 f"{int(r['prioritarias'])} prioritarias")
+    else:
+        frase = (f"{row['COLONIA']}: {int(row['manzanas_prioritarias'])} manzanas "
+                 f"prioritarias de {int(row['total_manzanas'])}")
     es_sel = (colonia_sel == row["COLONIA"])
     color = colormap(row["manzanas_prioritarias"])
-    # Con colonia seleccionada: la colonia pasa a solo-contorno para no competir
-    # visualmente con el relleno de las manzanas que se dibujan encima.
-    fill_opacity = 0.0 if colonia_sel else 0.75
+    fill_opacity = 0.0 if solo_contorno else 0.75
     folium.GeoJson(
         row["geometry"],
         style_function=lambda _, c=color, sel=es_sel, fo=fill_opacity: {
@@ -125,10 +194,16 @@ for _, row in col_filt.iterrows():
 
 colormap.add_to(m)
 
-# ── Capa de manzanas — solo dentro de la colonia seleccionada ────────────────
-if colonia_sel:
-    mz = cargar_manzanas_colonia()
-    mz_col = mz[mz["COLONIA"] == colonia_sel].copy()
+# ── Capa de manzanas — colonia seleccionada, o manzanas de la sección buscada ──
+if modo == "Colonia" and colonia_sel:
+    mz_scope = mz_todas[mz_todas["COLONIA"] == colonia_sel].copy()
+elif modo == "Sección" and sec_sel and sec_sel in SECCIONES_CON_COLONIA:
+    mz_scope = mz_todas[mz_todas["SECCION"] == sec_sel].copy()
+else:
+    mz_scope = None
+
+if mz_scope is not None:
+    mz_col = mz_scope
 
     mz_prio = mz_col[mz_col["es_prioritaria_s1"] == True]
     mz_dest = mz_col[
@@ -226,6 +301,21 @@ if colonia_sel:
         except Exception:
             pass
 
+# ── Contorno de sección — encima de todo, cuando se busca por sección ─────────
+if modo == "Sección" and sec_sel:
+    sec_geom_rows = secs_geo.loc[secs_geo["SECCION"] == sec_sel, "geometry"]
+    if len(sec_geom_rows):
+        geom_sec = sec_geom_rows.values[0]
+        folium.GeoJson(
+            geom_sec,
+            style_function=lambda _: {
+                "fillOpacity": 0, "color": COLOR_ALTA, "weight": 3.5,
+            },
+            tooltip=f"Sección {int(sec_sel)}",
+        ).add_to(m)
+        minx, miny, maxx, maxy = geom_sec.bounds
+        m.fit_bounds([[miny, minx], [maxy, maxx]])
+
 if colonia_sel:
     geom_sel = col.loc[col["COLONIA"] == colonia_sel, "geometry"].values[0]
     minx, miny, maxx, maxy = geom_sel.bounds
@@ -236,7 +326,46 @@ st_folium(m, use_container_width=True, height=480, returned_objects=[])
 # ── Panel dual ──────────────────────────────────────────────────────────────────
 st.markdown("<br>", unsafe_allow_html=True)
 
-if colonia_sel:
+if modo == "Sección":
+    if sec_sel and resumen_sec is not None:
+        st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.72rem;"
+                    f"letter-spacing:0.1em;text-transform:uppercase;margin:0;'>"
+                    f"Colonias en esta sección</p>", unsafe_allow_html=True)
+        st.markdown(f"<h2 style='color:{COLOR_TEXTO};margin:0.1rem 0 0.8rem;"
+                    f"font-size:1.6rem;'>Sección {int(sec_sel)}</h2>", unsafe_allow_html=True)
+
+        n_col = len(resumen_sec)
+        if n_col == 1:
+            st.markdown(f"<p style='color:{COLOR_TEXTO};font-size:0.95rem;margin-bottom:0.8rem;'>"
+                        f"La sección {int(sec_sel)} está en "
+                        f"<b style='color:{COLOR_ACENTO};'>{resumen_sec.iloc[0]['COLONIA']}</b>.</p>",
+                        unsafe_allow_html=True)
+        else:
+            st.markdown(f"<p style='color:{COLOR_TEXTO};font-size:0.95rem;margin-bottom:0.8rem;'>"
+                        f"La sección {int(sec_sel)} cruza <b style='color:{COLOR_ACENTO};'>"
+                        f"{n_col} colonias</b> — no coincide con un solo límite de colonia.</p>",
+                        unsafe_allow_html=True)
+
+        tabla_sec = resumen_sec.copy()
+        tabla_sec["ln"] = tabla_sec["ln"].apply(lambda x: f"{x:,.0f}")
+        tabla_sec["pct_manzanas"] = tabla_sec["pct_manzanas"].apply(lambda x: f"{x:.0f}%")
+        tabla_sec = tabla_sec[["COLONIA", "manzanas", "pct_manzanas", "ln", "prioritarias"]]
+        tabla_sec.columns = ["Colonia", "Manzanas en la sección", "% de la sección",
+                             "LN en esa colonia", "Manzanas prioritarias"]
+        st.dataframe(tabla_sec, use_container_width=True, hide_index=True)
+
+        st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.72rem;margin-top:0.6rem;'>"
+                    f"El % es sobre el total de manzanas de la sección, no de la colonia. "
+                    f"Consulta 🔍 Fichas de sección para el detalle electoral de la sección "
+                    f"{int(sec_sel)}.</p>", unsafe_allow_html=True)
+    elif sec_sel:
+        pass  # ya se mostró el aviso de brecha cartográfica arriba del mapa
+    else:
+        st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.85rem;'>"
+                    f"Selecciona una sección arriba para ver a qué colonia o colonias "
+                    f"pertenece.</p>", unsafe_allow_html=True)
+
+elif colonia_sel:
     row = col[col["COLONIA"] == colonia_sel].iloc[0]
 
     st.markdown(f"<p style='color:{COLOR_SECUNDARIO};font-size:0.72rem;"
