@@ -305,24 +305,30 @@ with st.expander("📋  Notas sobre los datos y alcance del modelo", expanded=Fa
             Nota sobre cobertura cartográfica
         </p>
         <p>En julio de 2026, la lista nominal del INE para La Magdalena Contreras
-           registra <strong style='color:{COLOR_ACENTO};'>151 secciones</strong>.
-           La última versión disponible del mapa de secciones, publicada por el INE
-           en diciembre de 2025, no contempla aún el reseccionamiento más reciente.</p>
+           registra <strong style='color:{COLOR_ACENTO};'>151 secciones</strong>. Esta
+           versión de la plataforma incorpora la lista nominal real del INE a nivel
+           manzana (obtenida vía transparencia), cruzada contra la cartografía oficial
+           más reciente disponible — esto resolvió el hueco que existía anteriormente
+           en la sección 3072 (ranking #14 · 1,771 electores), que ahora cuenta con
+           detalle completo de manzanas y mapa de campo, igual que el resto de las
+           secciones operativas.</p>
         <p>Cuando el INE modifica los límites de una sección —lo que se llama
            reseccionamiento— la lista nominal y el mapa se actualizan en momentos
            distintos. Eso genera secciones que aparecen en el padrón pero que todavía
-           no tienen correspondencia en la cartografía ni en el marco de manzanas
-           que usa el modelo.</p>
-        <p>En este caso, la discrepancia afecta a
-           <strong style='color:{COLOR_ACENTO};'>una sola sección prioritaria:
-           la sección 3072</strong> (ranking #14 · 1,773 electores). La identificamos,
-           está incluida en el ranking con todos sus indicadores, pero no contamos
-           con el detalle de manzanas para generar su mapa de campo.</p>
+           no tienen cartografía propia. En este caso persiste ese hueco para
+           <strong style='color:{COLOR_ACENTO};'>tres secciones de reseccionamiento
+           reciente: 5654, 5655 y 5656</strong> (6,911 electores en conjunto), que
+           el INE aún no publica con geometría independiente.</p>
+        <p>Mientras el INE publica su cartografía propia, estas tres secciones se
+           tratan como un solo bloque operativo, usando como referencia territorial
+           el contorno de la sección 3088 (su predecesora antes del reseccionamiento),
+           con la lista nominal real de cada una ya incorporada al modelo.</p>
         <p><strong style='color:{COLOR_ACENTO};'>Indicación para el coordinador
-           de sección 3072:</strong> cubrir la sección completa usando el contorno
-           visible en el Mapa de Secciones como referencia. Con 1,773 electores
-           en el contexto de una interna, es operativamente viable sin necesidad
-           de priorizar por manzana.</p>
+           de este bloque (5654/5655/5656):</strong> cubrir el área completa usando
+           el contorno de la sección 3088 visible en el Mapa de Secciones como
+           referencia, sin desagregar por las tres secciones nuevas — no priorizar
+           por manzana dentro de este bloque, dado que no existe cartografía
+           independiente para diferenciarlas todavía.</p>
     </div>
     """, unsafe_allow_html=True)
 
