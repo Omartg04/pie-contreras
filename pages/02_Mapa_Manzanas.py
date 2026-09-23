@@ -13,7 +13,7 @@ from app_utils import (
     cargar_unificado, cargar_ranking, cargar_secciones,
     COLOR_ALTA, COLOR_ACENTO, COLOR_MEDIA, COLOR_BAJA, COLOR_MORENA,
     COLOR_TARJETA, COLOR_TEXTO, COLOR_SECUNDARIO,
-    PROYECTO, CARTO_TILES, CARTO_ATTR,
+    PROYECTO, CARTO_TILES, CARTO_ATTR, agregar_controles_mapa,
 )
 
 st.set_page_config(
@@ -265,6 +265,9 @@ folium.GeoJson(
     ),
     name="Contornos de sección",
 ).add_to(m)
+
+# ── Capa satelital alternable + pantalla completa (al final, tras todas las capas) ──
+agregar_controles_mapa(m)
 
 # ── Layout ────────────────────────────────────────────────────────────────────
 col_mapa, col_panel = st.columns([3, 1])

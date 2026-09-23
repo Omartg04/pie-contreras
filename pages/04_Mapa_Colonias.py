@@ -17,7 +17,7 @@ from app_utils import (
     cargar_colonias, cargar_manzanas_colonia, cargar_secciones, PROYECTO,
     COLOR_ALTA, COLOR_ACENTO, COLOR_MEDIA,
     COLOR_TARJETA, COLOR_TEXTO, COLOR_SECUNDARIO,
-    CARTO_TILES, CARTO_ATTR,
+    CARTO_TILES, CARTO_ATTR, agregar_controles_mapa,
 )
 
 st.set_page_config(
@@ -320,6 +320,9 @@ if colonia_sel:
     geom_sel = col.loc[col["COLONIA"] == colonia_sel, "geometry"].values[0]
     minx, miny, maxx, maxy = geom_sel.bounds
     m.fit_bounds([[miny, minx], [maxy, maxx]])
+
+# ── Capa satelital alternable + pantalla completa (al final, tras todas las capas) ──
+agregar_controles_mapa(m)
 
 st_folium(m, use_container_width=True, height=480, returned_objects=[])
 

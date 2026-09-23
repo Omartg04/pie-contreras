@@ -5,6 +5,8 @@ Utilidades compartidas: paleta, estilos, autenticación, helpers de datos.
 import streamlit as st
 import pandas as pd
 import geopandas as gpd
+import folium
+from folium import plugins as folium_plugins
 from datetime import date
 
 # ── Paleta de color — Identidad oficial Morena ────────────────────────────────
@@ -279,6 +281,41 @@ CARTO_ATTR  = (
     "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> "
     "contributors © <a href='https://carto.com/attributions'>CARTO</a>"
 )
+
+# ── Capa satelital (secundaria) + controles de mapa ───────────────────────────
+# Esri World Imagery — gratuita, sin API key. Se ofrece como capa alternable,
+# nunca como basemap por default (CARTO Positron sigue siendo el default en
+# todas las páginas de mapa).
+ESRI_TILES = (
+    "https://server.arcgisonline.com/ArcGIS/rest/services/"
+    "World_Imagery/MapServer/tile/{z}/{y}/{x}"
+)
+ESRI_ATTR = (
+    "Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community"
+)
+
+def agregar_controles_mapa(m):
+    """
+    Agrega a un mapa folium ya construido: capa satelital alternable (Esri World
+    Imagery, apagada por default) + botón de pantalla completa + selector de capas.
+
+    Llamar al FINAL, después de agregar todas las capas de overlay (manzanas,
+    contornos, colonias) y antes de renderizar con st_folium() — LayerControl
+    solo detecta correctamente las capas que ya existen en el mapa al momento
+    de agregarse.
+    """
+    folium.TileLayer(
+        tiles=ESRI_TILES, attr=ESRI_ATTR, name="Satélite",
+        overlay=False, control=True,
+    ).add_to(m)
+    folium_plugins.Fullscreen(
+        position="topleft",
+        title="Pantalla completa",
+        title_cancel="Salir de pantalla completa",
+        force_separate_button=True,
+    ).add_to(m)
+    folium.LayerControl(position="topright", collapsed=True).add_to(m)
+    return m
 
 # ── Carga de datos con caché ───────────────────────────────────────────────────
 @st.cache_data
